@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="mobile-web-app-capable" content="yes" />
+      <!-- Hoja de estilos -->
+    <link rel="stylesheet" href="assets/styles/style.css">
+      <!-- Script diferido -->
+    <script type="module" src="assets/scripts/script.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.1/build/global/luxon.min.js"></script>
+    <title>DeVoleaTV | ENVIVO</title>
+</head>
+
+<body>
+    <header>
+        <a href="#" class="header-logo">
+            <img class="logo-img" src="assets/images/devolealogo.svg" alt="Logo DeVoleaTV">
+        </a>
+    </header>
+    <main>
+        <div class="player-box">
+            <iframe id="main-frame"
+                    src=""
+                    allowfullscreen
+                    loading="lazy"
+                    title="Reproductor en vivo">
+            </iframe>
+            <div class="player-info">
+                <div class="match-a">
+                    <div class="match-info">
+                        <div id="match-info-tournament-hour">
+                            <p class="tournament">Sin datos</p>
+                            <p class="tournament">|</p>
+                            <p class="hour">00:00</p>
+                        </div>
+                        <div id="match-info-teams">
+                            <p class="teams" id="teams-player"></p>
+                        </div>
+                    </div>
+                    <div id="match-info-img">
+                        <a href="#">
+                            <img src="assets/images/share.svg" alt="CompartirDirecto" >
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="gamelist">
+            <h2>Partidos de Hoy</h2>
+            <ul>
+            </ul>
+        </div>
+
+        <div class="ad">
+            <p>HOLA ESTE ES EL ANUNCIO</p>
+        </div>
+    </main>
+
+    <footer>
+        <p>2025 | DeVoleaTV</p>
+    </footer>
+</body>
+
+</html>
