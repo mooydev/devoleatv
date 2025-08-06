@@ -87,7 +87,7 @@ function renderizarLista(partidos) {
   });
 }
 
-const API_URL = "http://localhost:3000/api/partidos"
+const API_URL = "https://devoleatv-api.onrender.com/api/partidos"
 // inicializa la app
 function init() {
   fetch(API_URL)
