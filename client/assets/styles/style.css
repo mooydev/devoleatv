@@ -47,10 +47,12 @@ img{
   display: block;
 }
 
+
 /* 3. Encabezado */
 header {
   text-align: center;
   margin-bottom: 1.5rem;
+  position: sticky;
 }
 
 header img {
@@ -167,7 +169,18 @@ html {
 }
 
 #match-info-img{
+  max-width: 30px;
   margin: 1rem;
+}
+
+#match-info-img-button{
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+#match-info-img-button:active{
+  transform: scale(0.98); /* Slightly shrink the button */
 }
 
 /* 6. Anuncio */
@@ -272,3 +285,31 @@ footer {
     min-height: 50px;
   }
 }
+
+   /* Fondo del loader */
+    #loader {
+        width: 100%; height: 80%;
+        background: transparent;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    /* Spinner circular */
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid #ffffff;
+        border-top: 5px solid #BB0015;
+        border-radius: 50%;
+        animation: girar 1s linear infinite;
+        box-shadow: 0px -3px 9px 5px rgba(156, 0, 19, 0.67) inset;
+          -webkit-box-shadow: 0px -3px 9px 5px rgba(156, 0, 19, 0.67) inset;
+          -moz-box-shadow: 0px -3px 9px 5px rgba(156, 0, 19, 0.67) inset;
+    }
+
+    @keyframes girar {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }

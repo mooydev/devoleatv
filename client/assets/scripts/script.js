@@ -4,6 +4,9 @@ const hourElem = document.querySelector('.player-info .hour');
 const teamsElem = document.getElementById('teams-player');
 const gamelist = document.querySelector('.gamelist ul');
 const playerBox = document.querySelector('.player-box');
+const reloadButton = document.getElementById("match-info-img-button").onclick = reloadFrame;
+const loader =  document.getElementById("loader");
+
 
 const {DateTime} = luxon;
 // función para convertir hora "HH:mm" que llega del endpoint
@@ -93,6 +96,7 @@ function init() {
   fetch(API_URL)
     .then(res => res.json())
     .then(partidos => {
+      loader.style.display = "none";
       if (partidos.length > 0) {
         renderizarLista(partidos);
         actualizarPlayer(partidos[0]);
@@ -105,5 +109,13 @@ function init() {
       gamelist.innerHTML = '<li>Error al cargar partidos.</li>';
     });
 }
+
+
+
+
+function reloadFrame(){
+  iframe.src = iframe.src;
+}
+
 init(); // lanzamiento
 

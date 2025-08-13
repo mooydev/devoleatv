@@ -10,14 +10,14 @@
     <link rel="stylesheet" href="assets/styles/style.css">
       <!-- Script diferido -->
     <script type="module" src="assets/scripts/script.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@3.7.1/build/global/luxon.min.js"></script>
+    <script src="assets/scripts/luxon.min.js"></script>
     <title>DeVoleaTV | ENVIVO</title>
 </head>
 
 <body>
     <header>
         <a href="#" class="header-logo">
-            <img class="logo-img" src="assets/images/devolealogo.svg" alt="Logo DeVoleaTV">
+            <img class="logo-img" src="assets/images/devolealogoPNG.png" alt="Logo DeVoleaTV">
         </a>
     </header>
     <main>
@@ -40,16 +40,19 @@
                             <p class="teams" id="teams-player"></p>
                         </div>
                     </div>
-                    <div id="match-info-img">
-                        <a href="#">
-                            <img src="assets/images/share.svg" alt="CompartirDirecto" >
-                        </a>
+                    <div id="match-info-img" >
+                        <button type="submit" id="match-info-img-button" onclick="reloadFrame()">
+                            <img src="assets/images/update.svg" alt="Recargar Reproductor" />
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="gamelist">
             <h2>Partidos de Hoy</h2>
+            <div id="loader">
+                <div class="spinner"></div>
+            </div>
             <ul>
             </ul>
         </div>
