@@ -296,6 +296,23 @@ footer {
   }
 }
 
+/* Agregar al final de tu CSS */
+.webview-android body {
+    background-color: #000000 !important;
+}
+
+.webview-android main {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Desactivar media query problemático en WebView */
+.webview-android main {
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+}
+
+
    /* Fondo del loader */
     #loader {
         width: 100%; height: 80%;
