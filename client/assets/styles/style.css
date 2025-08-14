@@ -15,7 +15,7 @@ body {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  background-color: #bb0015;
+  background-color: #000000;
   color: #ffffff;
   line-height: 1.5;
   padding: 0.5rem 0.2rem 0 0.2rem;
@@ -326,10 +326,24 @@ footer {
 
 /* ✅ 6. ESPECÍFICO PARA WEBVIEW ANDROID */
 .webview-android main {
-  display: flex !important;
+  font-family: "Roboto Condensed", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  background-color: #000000;
+  color: #ffffff;
+  line-height: 1.5;
+  padding: 0.5rem 0.2rem 0 0.2rem;
+  /*padding: 1rem 0.2rem 0 0.2rem;*/
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /*display: flex !important;
   flex-direction: column !important;
   grid-template-columns: none !important;
-  grid-template-rows: none !important;
+  grid-template-rows: none !important;*/
 }
 
 .webview-android .player-box iframe {
