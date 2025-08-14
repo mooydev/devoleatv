@@ -211,11 +211,11 @@ footer {
 }
 
 /*1. Pantallas con orientación landscape (horizontal) */
-@media (orientation: landscape) {
+@media (orientation: landscape) and (min-width: 768px) {
   body {
-    background-color: #000000; /* azul oscuro */
+    background-color: #000000;
   }
-   main {
+  main {
     display: grid;
     grid-template-columns: 60% 40%;
     grid-template-rows: repeat(2, 1fr);
@@ -227,12 +227,12 @@ footer {
   }
 
   .player-box iframe {
-  width: 100%;
-  aspect-ratio: 21 / 9;
-  border: none;
-  border-radius: 1.2rem 1.2rem 0 0;
-  max-width: 100%;
-  height: auto;
+    width: 100%;
+    aspect-ratio: 21 / 9;
+    border: none;
+    border-radius: 1.2rem 1.2rem 0 0;
+    max-width: 100%;
+    height: auto;
   } 
 
   .ad{
@@ -251,11 +251,20 @@ footer {
   }
 }
 
-/*2. Pantallas con orientación portrait (vertical) */
+/*2. Pantallas con orientación portrait (vertical) - MÓVILES */
 @media (orientation: portrait) {
   body {
-    background-color: #000000; /* rojo oscuro */
+    background-color: #000000;
   }
+  
+  /* ✅ FORZAR LAYOUT VERTICAL */
+  main {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+  }
+  
   .ad{
     max-height: 10vh;
   }
@@ -264,10 +273,10 @@ footer {
   }
 }
 
-/*3. Pantallas ultra anchas (como 21:9 o monitores grandes) */
-@media (min-aspect-ratio: 21/9) {
+/*3. Pantallas ultra anchas - SOLO PARA DESKTOP */
+@media (min-aspect-ratio: 21/9) and (min-width: 1400px) {
   body {
-    background-color: #000000; /* verde oscuro */
+    background-color: #000000;
   }
   main{
     gap: 1.5rem;
@@ -287,8 +296,27 @@ footer {
   }
 }
 
-/* ✅ 4. Pantallas más altas que anchas (ej: móviles muy verticales) */
+/* ✅ 4. Pantallas móviles - FORZAR SIEMPRE FLEXBOX */
+@media (max-width: 768px) {
+  main {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+  }
+  
+  .player-box iframe {
+    aspect-ratio: 16/9 !important;
+  }
+}
+
+/* ✅ 5. Pantallas muy verticales */
 @media (max-aspect-ratio: 3/4) {
+  main {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
   footer{
     align-content: center;
     font-size: 1rem;
@@ -296,20 +324,16 @@ footer {
   }
 }
 
-/* Agregar al final de tu CSS */
-.webview-android body {
-    background-color: #000000 !important;
+/* ✅ 6. ESPECÍFICO PARA WEBVIEW ANDROID */
+.webview-android main {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: none !important;
+  grid-template-rows: none !important;
 }
 
-.webview-android main {
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* Desactivar media query problemático en WebView */
-.webview-android main {
-    grid-template-columns: none !important;
-    grid-template-rows: none !important;
+.webview-android .player-box iframe {
+  aspect-ratio: 16/9 !important;
 }
 
 
