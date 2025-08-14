@@ -21,6 +21,7 @@ body {
   padding: 0.5rem 0.2rem 0 0.2rem;
   /*padding: 1rem 0.2rem 0 0.2rem;*/
   height: 100vh;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -31,6 +32,7 @@ main{
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0
 }
 
 .header-logo{
@@ -56,6 +58,8 @@ header {
   position: relative; /* Cambiar de sticky a relative */
   flex-shrink: 0; /* Evitar que se comprima */
   z-index: 10; /* Asegurar que esté por encima de otros elementos */
+  flex-shrink: 0; /* No permitir compresión */
+  flex-grow: 0; /* No permitir crecimiento */
 }
 
 header img {
@@ -70,7 +74,8 @@ header img {
   align-items: center;
   justify-content: center;
   width: 100%;
-  flex-shrink: 0;
+  flex-shrink: 0; /* No permitir compresión */
+  flex-grow: 0; /* No permitir crecimiento */
 }
 
 .player-box iframe {
@@ -118,6 +123,7 @@ box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
   flex: 1;
   overflow-y: auto;
   padding-right: 0.5rem;
+  min-height: 0
 }
 
 .gamelist h2 {
@@ -192,7 +198,8 @@ html {
   padding: 1rem;
   text-align: center;
   margin-bottom: 1rem;
-  flex-shrink: 0;
+  flex-shrink: 0; /* No permitir compresión */
+  flex-grow: 0; /* No permitir crecimiento */
 }
 
 /* 7. Pie de página */
