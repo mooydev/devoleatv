@@ -1,4 +1,17 @@
-/* 1. Reset básico y tipografía */
+/* ===========================================
+   VARIABLES Y BASE (igual que antes)
+=========================================== */
+:root {
+  --color-primary: #BB0015;
+  --color-primary-dark: rgba(156, 0, 19, 0.67);
+  --color-bg: #000000;
+  --color-text: #ffffff;
+  --color-accent: #777;
+  --border-radius: 1.2rem;
+  --box-shadow-inset: 0px -3px 9px 5px var(--color-primary-dark) inset;
+  --transition: all 0.2s ease;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -6,8 +19,12 @@
 }
 
 @font-face {
-font-family: "Roboto Condensed";
-src: url('../fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype');
+  font-family: "Roboto Condensed";
+  src: url('../fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype');
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -15,91 +32,76 @@ body {
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
-  background-color: #000000;
-  color: #ffffff;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   line-height: 1.5;
   padding: 0.5rem 0.2rem 0 0.2rem;
-  /*padding: 1rem 0.2rem 0 0.2rem;*/
-  height: 100vh;
   height: 100dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-main{
+/* ===========================================
+   LAYOUT BASE - MÓVIL FIRST
+=========================================== */
+main {
   flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 0
+  min-height: 0;
 }
 
-.header-logo{
-  display: flex;
-  justify-content: center;
-  flex-direction: row;
-  align-items: center;
-}
-
-
-/* 2. Imágenes y video responsivos */
-img{
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-
-/* 3. Encabezado */
+/* Resto de estilos base (header, player-box, etc.) igual que antes */
 header {
   text-align: center;
   margin-bottom: 1.5rem;
-  position: relative; /* Cambiar de sticky a relative */
-  flex-shrink: 0; /* Evitar que se comprima */
-  z-index: 10; /* Asegurar que esté por encima de otros elementos */
-  flex-shrink: 0; /* No permitir compresión */
-  flex-grow: 0; /* No permitir crecimiento */
+  position: relative;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+.header-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 header img {
   width: 50%;
-  filter: drop-shadow(0px 0px 20px #BB0015);
+  filter: drop-shadow(0px 0px 20px var(--color-primary));
 }
 
-/* 4. Reproductor de video */
-.player-box{
+.player-box {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  flex-shrink: 0; /* No permitir compresión */
-  flex-grow: 0; /* No permitir crecimiento */
+  flex-shrink: 0;
 }
 
 .player-box iframe {
   width: 100%;
   aspect-ratio: 16 / 9;
   border: none;
-  border-radius: 1.2rem 1.2rem 0 0;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
   max-width: 100%;
   height: auto;
 }
 
 .player-info {
-    display: flex;
-    flex-direction: row;
-    background-color: #BB0015;
-    padding: 0.5rem;
-    border-radius: 0 0 1.2rem 1.2rem;
-    width: 100%;
-box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
--webkit-box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
--moz-box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
+  display: flex;
+  flex-direction: row;
+  background-color: var(--color-primary);
+  padding: 0.5rem;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  width: 100%;
+  box-shadow: var(--box-shadow-inset);
 }
 
-.match-info{
+.match-info {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -110,271 +112,194 @@ box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
   margin: 0.2rem 0;
 }
 
-#match-info-tournament-hour{
+#match-info-tournament-hour {
   font-size: 0.8rem;
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
 }
 
-#match-info-teams{
+#match-info-teams {
   font-size: 1.2rem;
 }
 
-/* 5. Lista de partidos */
-.gamelist{
+#match-info-img {
+  max-width: 30px;
+  margin: 1rem;
+}
+
+#match-info-img-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+#match-info-img-button:active {
+  transform: scale(0.98);
+}
+
+.gamelist {
   flex: 1;
   overflow-y: auto;
   padding-right: 0.5rem;
-  min-height: 0
+  min-height: 0;
 }
 
 .gamelist h2 {
   font-size: 1.2rem;
   position: sticky;
   top: 0;
-  background-color: #000000;
+  background-color: var(--color-bg);
   z-index: 1;
   padding: 0.8rem;
-
 }
 
 .match {
   display: flex;
   flex-direction: row;
-  background-color: #BB0015;
+  background-color: var(--color-primary);
   padding: 0.5rem;
   margin-bottom: 0.5rem;
-  border-radius: 6px;
-  border-radius: 1.2rem;
+  border-radius: var(--border-radius);
   width: 100%;
-  box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
--webkit-box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
--moz-box-shadow: 0px -3px 9px 5px rgba(156,0,19,0.67) inset;
+  box-shadow: var(--box-shadow-inset);
+  transition: var(--transition);
 }
 
-.match.active{
-  color: #BB0015;
-  background-color: #FFFFFF;
+.match.active {
+  color: var(--color-primary);
+  background-color: var(--color-text);
   box-shadow: 0px -3px 9px 5px rgba(190, 190, 190, 0.67) inset;
 }
 
-/* Suavizar scroll al reproductor */
-html {
-  scroll-behavior: smooth;
-}
-
 .match-a {
-    display: flex;
-    text-decoration: none;
-    color: inherit;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-
-#match-info-tournament-hour{
   display: flex;
+  text-decoration: none;
+  color: inherit;
   flex-direction: row;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
-#match-info-img{
-  max-width: 30px;
-  margin: 1rem;
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
-#match-info-img-button{
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-}
-
-#match-info-img-button:active{
-  transform: scale(0.98); /* Slightly shrink the button */
-}
-
-/* 6. Anuncio */
 .ad {
   background-color: yellow;
   padding: 1rem;
   text-align: center;
   margin-bottom: 1rem;
-  flex-shrink: 0; /* No permitir compresión */
-  flex-grow: 0; /* No permitir crecimiento */
+  flex-shrink: 0;
 }
 
-/* 7. Pie de página */
 footer {
-  background-color: #BB0015;
+  background-color: var(--color-primary);
   text-align: center;
   font-size: 0.9rem;
-  color: #777;
+  color: var(--color-accent);
+  display: none;
 }
 
-/*1. Pantallas con orientación landscape (horizontal) */
-@media (orientation: landscape) and (min-width: 768px) {
-  body {
-    background-color: #000000;
-  }
-  main {
-    display: grid;
-    grid-template-columns: 60% 40%;
-    grid-template-rows: repeat(2, 1fr);
-    gap: .5rem;
-  }
-
-  .player-box{
-    justify-content: start;
-  }
-
-  .player-box iframe {
-    width: 100%;
-    aspect-ratio: 21 / 9;
-    border: none;
-    border-radius: 1.2rem 1.2rem 0 0;
-    max-width: 100%;
-    height: auto;
-  } 
-
-  .ad{
-    grid-column: span 2 / span 2;
-    margin: 0;
-    max-height: 120px;
-    min-height: 120px;
-  }
-
-  .logo-img{
-    max-width: 20%;
-  }
-
-  footer{
-    display: none;
-  }
-}
-
-/*2. Pantallas con orientación portrait (vertical) - MÓVILES */
-@media (orientation: portrait) {
-  body {
-    background-color: #000000;
-  }
-  
-  /* ✅ FORZAR LAYOUT VERTICAL */
-  main {
-    display: flex !important;
-    flex-direction: column !important;
-    grid-template-columns: none !important;
-    grid-template-rows: none !important;
-  }
-  
-  .ad{
-    max-height: 10vh;
-  }
-  footer{
-    display: none;
-  }
-}
-
-/*3. Pantallas ultra anchas - SOLO PARA DESKTOP */
-@media (min-aspect-ratio: 21/9) and (min-width: 1400px) {
-  body {
-    background-color: #000000;
-  }
-  main{
-    gap: 1.5rem;
-  }
-  #match-info-tournament-hour{
-    font-size: 1.5rem;
-  }
-  .gamelist h2,
-  #match-info-teams{
-    font-size: 2rem;
-  }
-  .player-box iframe{
-    aspect-ratio: 21/9;
-  }
-  footer{
-    display: none;
-  }
-}
-
-/* ✅ 4. Pantallas móviles - FORZAR SIEMPRE FLEXBOX */
-@media (max-width: 768px) {
-  main {
-    display: flex !important;
-    flex-direction: column !important;
-    grid-template-columns: none !important;
-    grid-template-rows: none !important;
-  }
-  
-  .player-box iframe {
-    aspect-ratio: 16/9 !important;
-  }
-}
-
-/* ✅ 5. Pantallas muy verticales */
-@media (max-aspect-ratio: 3/4) {
-  main {
-    display: flex !important;
-    flex-direction: column !important;
-  }
-  
-  footer{
-    align-content: center;
-    font-size: 1rem;
-    min-height: 50px;
-  }
-}
-
-/* ✅ 6. ESPECÍFICO PARA WEBVIEW ANDROID */
-.webview-android main {
-  font-family: "Roboto Condensed", sans-serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-  background-color: #000000;
-  color: #ffffff;
-  line-height: 1.5;
-  padding: 0.5rem 0.2rem 0 0.2rem;
-  /*padding: 1rem 0.2rem 0 0.2rem;*/
-  height: 100vh;
-  height: 100dvh;
+#loader {
+  width: 100%;
+  height: 80%;
+  background: transparent;
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  /*display: flex !important;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid var(--color-text);
+  border-top: 5px solid var(--color-primary);
+  border-radius: 50%;
+  animation: girar 1s linear infinite;
+  box-shadow: var(--box-shadow-inset);
+}
+
+@keyframes girar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===========================================
+   LAYOUTS ESPECÍFICOS POR CLASE
+=========================================== */
+
+/* Layout Desktop - Pantallas anchas */
+.layout-desktop main {
+  display: grid !important;
+  grid-template-columns: 60% 40% !important;
+  grid-template-rows: repeat(2, 1fr) !important;
+  gap: 0.5rem !important;
+}
+
+.layout-desktop .player-box {
+  justify-content: flex-start;
+}
+
+.layout-desktop .player-box iframe {
+  aspect-ratio: 21 / 9 !important;
+}
+
+.layout-desktop .ad {
+  grid-column: span 2;
+  margin: 0;
+  max-height: 120px;
+  min-height: 120px;
+}
+
+.layout-desktop .logo-img {
+  max-width: 20%;
+}
+
+/* Layout Móvil - Siempre flexbox vertical */
+.layout-mobile main,
+.webview-android main {
+  display: flex !important;
   flex-direction: column !important;
   grid-template-columns: none !important;
-  grid-template-rows: none !important;*/
+  grid-template-rows: none !important;
 }
 
+.layout-mobile .player-box iframe,
 .webview-android .player-box iframe {
   aspect-ratio: 16/9 !important;
 }
 
+.layout-mobile .ad {
+  max-height: 10vh;
+}
 
-   /* Fondo del loader */
-    #loader {
-        width: 100%; height: 80%;
-        background: transparent;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-    }
+/* Layout Tablet */
+.layout-tablet main {
+  display: flex !important;
+  flex-direction: column !important;
+}
 
-    /* Spinner circular */
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #ffffff;
-        border-top: 5px solid #BB0015;
-        border-radius: 50%;
-        animation: girar 1s linear infinite;
-        box-shadow: 0px -3px 9px 5px rgba(156, 0, 19, 0.67) inset;
-          -webkit-box-shadow: 0px -3px 9px 5px rgba(156, 0, 19, 0.67) inset;
-          -moz-box-shadow: 0px -3px 9px 5px rgba(156, 0, 19, 0.67) inset;
-    }
+.layout-tablet footer {
+  display: block;
+  align-content: center;
+  font-size: 1rem;
+  min-height: 50px;
+}
 
-    @keyframes girar {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+/* Estilos específicos para WebView Android */
+.webview-android {
+  /* Forzar recálculo de layout */
+  transform: translateZ(0);
+}
+
+.webview-android main {
+  /* Asegurar que el flexbox funcione */
+  min-height: 0;
+  height: 100%;
+}

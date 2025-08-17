@@ -111,10 +111,55 @@ function init() {
 }
 
 
-
-
 function reloadFrame(){
   iframe.src = iframe.src;
+}
+
+
+// Detectar y manejar layout responsive
+function handleResponsiveLayout() {
+    const body = document.body;
+    const main = document.querySelector('main');
+    
+    // Obtener dimensiones reales de la ventana
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const aspectRatio = width / height;
+    
+    // Detectar WebView Android
+    const isWebViewAndroid = /Android/.test(navigator.userAgent) && 
+                             /wv/.test(navigator.userAgent);
+    
+    // Limpiar clases previas
+    body.classList.remove('layout-mobile', 'layout-tablet', 'layout-desktop', 'webview-android');
+    
+    if (isWebViewAndroid) {
+        body.classList.add('webview-android');
+    }
+    
+    // Determinar layout basado en dimensiones reales
+    if (width < 768) {
+        body.classList.add('layout-mobile');
+    } else if (aspectRatio > 1.5 && width >= 768) {
+        body.classList.add('layout-desktop');
+    } else {
+        body.classList.add('layout-tablet');
+    }
+    
+    console.log(`Dimensiones: ${width}x${height}, Aspect ratio: ${aspectRatio.toFixed(2)}`);
+}
+
+// Ejecutar al cargar y al cambiar tamaño
+window.addEventListener('load', handleResponsiveLayout);
+window.addEventListener('resize', handleResponsiveLayout);
+window.addEventListener('orientationchange', () => {
+    // Delay para que las dimensiones se actualicen
+    setTimeout(handleResponsiveLayout, 100);
+});
+
+// Para WebView Android, verificar periódicamente
+if (/Android/.test(navigator.userAgent) && /wv/.test(navigator.userAgent)) {
+    setInterval(handleResponsiveLayout, 1000);
 }
 
 init(); // lanzamiento
