@@ -135,6 +135,7 @@ function handleResponsiveLayout() {
     
     if (isWebViewAndroid) {
         body.classList.add('webview-android');
+        console.log('WebView Android detectado');
     }
     
     // Determinar layout basado en dimensiones reales
@@ -146,7 +147,7 @@ function handleResponsiveLayout() {
         body.classList.add('layout-tablet');
     }
     
-    console.log(`Dimensiones: ${width}x${height}, Aspect ratio: ${aspectRatio.toFixed(2)}`);
+    console.log(`Dimensiones: ${width}x${height}, Aspect ratio: ${aspectRatio.toFixed(2)}, Classes: ${body.className}`);
 }
 
 // Ejecutar al cargar y al cambiar tamaño
