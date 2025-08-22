@@ -6,13 +6,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#000000" />
     <meta name="mobile-web-app-capable" content="yes" />
+
+     <!-- SEO Meta Tags -->
+    <title>DeVoleaTV | Transmisiones Deportivas en Vivo - Fútbol y Más</title>
+    <meta name="description" content="Disfruta de los mejores partidos de fútbol en vivo gratis. DeVoleaTV te ofrece transmisiones deportivas de alta calidad las 24 horas.">
+    <meta name="keywords" content="fútbol en vivo, deportes gratis, transmisiones deportivas, partidos hoy, DeVoleaTV, roja directa, tarjeta roja, futbol libre">
+    <meta name="author" content="DeVoleaTV">
+
+     <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="DeVoleaTV | Transmisiones Deportivas en Vivo">
+    <meta property="og:description" content="Los mejores partidos de fútbol en vivo. Transmisiones deportivas gratuitas de alta calidad.">
+    <meta property="og:image" content="assets/images/devoleatv-og-image.jpg">
+    <meta property="og:url" content="https://www.devoleatv.xyz">
+    <meta property="og:site_name" content="DeVoleaTV">
+
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="assets/styles/style.css" as="style">
+    <link rel="preload" href="assets/images/devolealogoPNG.png" as="image">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "DeVoleaTV",
+        "description": "Transmisiones deportivas en vivo gratuitas",
+        "url": "https://www.devoleatv.xyz",
+    }
+    </script>
     <!-- Hoja de estilos -->
     <link rel="stylesheet" href="assets/styles/style.css">
     <!-- Script diferido -->
     <script type="module" src="assets/scripts/script.js" defer></script>
     <script src="assets/scripts/luxon.min.js"></script>
-    <script type='text/javascript'
-        src='//pl27442696.profitableratecpm.com/70/fc/53/70fc53897a6ed7fca96a39781bda4e7e.js'></script>
     <title>DeVoleaTV | ENVIVO</title>
 </head>
 
@@ -47,7 +74,10 @@
             </div>
         </div>
         <div class="gamelist">
-            <h2>Partidos de Hoy</h2>
+            <div class="gamelist-search">
+                <h2>Partidos de Hoy</h2>
+                <input type="text" name="search" id="search" placeholder="Equipo, liga...">
+            </div>
             <div id="loader">
                 <div class="spinner"></div>
             </div>
@@ -66,13 +96,17 @@
                 };
             </script>
             <script type="text/javascript"
-                src="//www.highperformanceformat.com/eb91c86995e612d4dd60ba5624f08004/invoke.js"></script>
+                src="//www.highperformanceformat.com/eb91c86995e612d4dd60ba5624f08004/invoke.js">
+            </script>
         </div>
     </main>
 
     <footer>
         <p>2025 | DeVoleaTV</p>
     </footer>
+    <script type='text/javascript'
+        src='//pl27442696.profitableratecpm.com/70/fc/53/70fc53897a6ed7fca96a39781bda4e7e.js'>
+    </script>
 </body>
 
 </html>

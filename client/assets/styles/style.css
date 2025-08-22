@@ -146,13 +146,43 @@ header img {
   min-height: 0;
 }
 
-.gamelist h2 {
-  font-size: 1.2rem;
+.gamelist-search{
   position: sticky;
   top: 0;
   background-color: var(--color-bg);
   z-index: 1;
   padding: 0.8rem;
+  display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gamelist-search h2{
+  font-size: 1.2rem;
+}
+
+.gamelist-search input{
+    font-size: 1.2rem;
+    color: #ffffff;
+    background-color: var(--color-bg);
+    background-image: url('../images/search.svg');
+    background-repeat: no-repeat;
+    width:5%;
+    height: 1.8rem;
+    padding: .3rem .3rem .3rem 1.8rem;
+    border-width: 0 0 2px 0;
+    border-color: var(--color-text);
+    transition: width 0.4s ease-in-out;
+}
+
+.gamelist-search input:focus{
+    color: #ffffff;
+    width: 30%;
+    border-width: 0 0 2px 0;
+    border-color: var(--color-primary);
+    outline: none;
 }
 
 .match {
@@ -190,7 +220,7 @@ img {
 }
 
 .ad {
-  background-color: yellow;
+  background-color: transparent;
   padding: 1rem;
   text-align: center;
   margin-bottom: 1rem;
