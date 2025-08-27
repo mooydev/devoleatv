@@ -17,7 +17,16 @@ export async function scrapeRedCard(){
 
 const URL = URL_SCR;
 
-const browser = await puppeteer.launch({ headless: true });
+const browser = await puppeteer.launch({ 
+  headless: true,
+  args: [
+      "--disable-setuid-sandbox",
+      "--no-sandbox",
+      "--single-process",
+      "--no-zygote",
+    ],
+  executablePath: puppeteer.executablePath()
+});
 const page = await browser.newPage();
 
 await page.goto(URL, { waitUntil: 'domcontentloaded' });
