@@ -49,7 +49,7 @@ export async function guardarPartidos(eventos) {
 export async function updateDb() {
     try{
         const eventos = await scrapeRedCard()
-        guardarPartidos(eventos)
+        await guardarPartidos(eventos)
     }catch(err){
         console.log("Error al actualizar la base de datos: " + err.message )
     }
