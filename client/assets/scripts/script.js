@@ -548,6 +548,9 @@ const App = {
   }
 };
 
+ document.getElementById("close-btn").addEventListener("click", function() {
+      document.getElementById("precontent-add").style.display = "none";})
+
 // ================================
 // INICIALIZACIÓN
 // ================================
