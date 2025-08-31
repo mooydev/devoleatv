@@ -334,8 +334,8 @@ footer {
   height: 100%;
 }
 
-    /* Contenedor del interstitial */
-    #precontent-add {
+    
+    /*#precontent-add {
       position: fixed;
       top: 0;
       left: 0;
@@ -348,7 +348,7 @@ footer {
       z-index: 9999;
     }
 
-    /* Caja del interstitial */
+    
     #precontent-add .content {
       background: #fff;
       width: 80%;
@@ -359,7 +359,7 @@ footer {
       position: relative;
     }
 
-    /* Botón de cierre */
+    
     #close-btn {
       position: absolute;
       top: 15px;
@@ -377,9 +377,8 @@ footer {
       background: #cc0000;
     }
 
-    /* Iframe ocupando la caja */
     #precontent-add-iframe {
       width: 100%;
       height: 100%;
       border: none;
-    }
+    }*/
