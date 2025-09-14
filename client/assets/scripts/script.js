@@ -1,7 +1,3 @@
-/**
- * Aplicación de Streaming de Partidos
- * Organizada por módulos para mejor mantenibilidad
- */
 
 // ================================
 // CONFIGURACIÓN Y CONSTANTES
@@ -16,7 +12,7 @@ const CONFIG = {
   },
   RESPONSIVE_CHECK_INTERVAL: 1000,
   POPUNDER_OPEN_INTERVAL: 7000,
-  POPUNDER_LIMIT: 3, 
+  POPUNDER_LIMIT: 3
 };
 
 // ================================
@@ -33,7 +29,6 @@ const DOMElements = {
   loader: null,
   inputSearch: null,
 
-  // Inicializar elementos del DOM
   init() {
     this.iframe = document.getElementById('main-frame');
     this.tournamentElem = document.querySelector('.player-info .tournament');
@@ -45,7 +40,6 @@ const DOMElements = {
     this.loader = document.getElementById("loader");
     this.inputSearch = document.getElementById("search");
 
-    // Validar que todos los elementos existan
     this.validateElements();
   },
 
@@ -65,6 +59,7 @@ const DOMElements = {
 const AppState = {
   partidosArray: [],
   currentStreamUrl: '',
+  currentActiveLink: null,
   letNextPopUnder: false,
   popUnderCount: 0,
 
@@ -75,13 +70,21 @@ const AppState = {
   setCurrentStream(url) {
     this.currentStreamUrl = url;
   },
-  
+
   setLetNextPopUnder(value) {
     this.letNextPopUnder = value;
   },
 
-  setPopUnderCount(value){
-    this.popUnderCount = value; 
+  setPopUnderCount(value) {
+    this.popUnderCount = value;
+  },
+
+  setActiveLink(linkIndex, partidoId) {
+    this.currentActiveLink = { linkIndex, partidoId };
+  },
+
+  getActiveLink() {
+    return this.currentActiveLink;
   },
 
   getCurrentStream() {
@@ -96,20 +99,15 @@ const AppState = {
     return this.letNextPopUnder;
   },
 
-  getPopUnderCount(){
+  getPopUnderCount() {
     return this.popUnderCount;
-  },
+  }
 };
 
 // ================================
 // UTILIDADES
 // ================================
 const Utils = {
-  /**
-   * Convierte hora UTC-5 a hora local
-   * @param {string} horaUTCmenos5 - Hora en formato "HH:mm"
-   * @returns {string} Hora formateada en zona local
-   */
   convertirHoraLocal(horaUTCmenos5) {
     if (!horaUTCmenos5 || typeof horaUTCmenos5 !== 'string') {
       return 'Hora no disponible';
@@ -136,103 +134,104 @@ const Utils = {
     }
   },
 
-  /**
-   * WebView Android
-   * @returns {boolean}
-   */
   isWebViewAndroid() {
     return /Android/.test(navigator.userAgent) && /wv/.test(navigator.userAgent);
   },
 
-  /**
-   * Sanitiza texto para prevenir XSS
-   * @param {string} text 
-   * @returns {string}
-   */
   sanitizeText(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
   }
-
 };
 
 // ================================
-// POPUNDER
+// MANEJO DE POPUNDER
 // ================================
-function openPopunder() {  
-  if (AppState.getPopUnderCount() >= CONFIG.POPUNDER_LIMIT || AppState.getLetNextPopUnder() == false) return; // Limita a 3
-  AppState.setPopUnderCount(AppState.getPopUnderCount()+1);
+const PopunderManager = {
+  open() {
+    if (AppState.getPopUnderCount() >= CONFIG.POPUNDER_LIMIT || !AppState.getLetNextPopUnder()) {
+      return;
+    }
 
-  // Intento de abrir popunder
-  let pop = window.open(
-    CONFIG.POPUNDER_URL,
-    '_blank',
-    'toolbar=no,scrollbars=yes,resizable=yes,width=800,height=600'
-  );
+    AppState.setPopUnderCount(AppState.getPopUnderCount() + 1);
 
-  if (pop) {
-    window.focus();
-    AppState.setLetNextPopUnder(false);
-    setTimeout(() => {
-    AppState.setLetNextPopUnder(true);
-    console.log(AppState.getLetNextPopUnder())
-  }, CONFIG.POPUNDER_OPEN_INTERVAL);
-  } else {
-    console.log("Popunder bloqueado por el navegador");
+    const pop = window.open(
+      CONFIG.POPUNDER_URL,
+      '_blank',
+      'toolbar=no,scrollbars=yes,resizable=yes,width=800,height=600'
+    );
+
+    if (pop) {
+      window.focus();
+      AppState.setLetNextPopUnder(false);
+      setTimeout(() => {
+        AppState.setLetNextPopUnder(true);
+      }, CONFIG.POPUNDER_OPEN_INTERVAL);
+    } else {
+      console.log("Popunder bloqueado por el navegador");
+    }
+  },
+
+  init() {
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        AppState.setLetNextPopUnder(true);
+      }, CONFIG.POPUNDER_OPEN_INTERVAL);
+
+      if (DOMElements.gamelist) {
+        DOMElements.gamelist.addEventListener('click', this.open);
+        DOMElements.gamelist.addEventListener('touchstart', this.open);
+      }
+    });
   }
-}
-
-// Abrir popunder en eventos seguros para evitar bloqueos
-document.addEventListener('DOMContentLoaded', () => {
-  // Abrir al hacer click o tocar algo
-  setTimeout(() => {
-    AppState.setLetNextPopUnder(true);
-    console.log(AppState.getLetNextPopUnder())
-  }, CONFIG.POPUNDER_OPEN_INTERVAL);
-  DOMElements.gamelist.addEventListener('click', openPopunder);
-  DOMElements.gamelist.addEventListener('touchstart', openPopunder);
-});
-
+};
 
 // ================================
 // MANEJO DE PARTIDOS
 // ================================
 const MatchManager = {
-  /**
-   * Actualiza el reproductor con información del partido
-   * @param {Object} partido - Objeto partido
-   */
-  actualizarPlayer(partido) {
+  actualizarPlayer(partido, linkIndex = 0) {
     if (!partido || !DOMElements.iframe) {
       console.error('Partido o iframe no válido');
       return;
     }
 
-    const link = partido.link || (partido.links && partido.links[0]);
-    if (!link) return; // si no hay links, salir
-    if (link === AppState.getCurrentStream()) return;
-    DOMElements.iframe.src = link;
-    AppState.setCurrentStream(link);
+    const link = partido.link || (partido.links && partido.links[linkIndex]);
+    if (!link || link === AppState.getCurrentStream()) {
+      return;
+    }
 
     try {
-      AppState.setCurrentStream(partido.link);
-      DOMElements.iframe.src = partido.link;
+      DOMElements.iframe.src = link;
+      AppState.setCurrentStream(link);
+      AppState.setActiveLink(linkIndex, partido.id_partido);
 
-      // Actualizar información del partido
       this.updateMatchInfo(partido);
       this.setActiveMatch(partido.id_partido);
+      this.setActiveLink(linkIndex, partido.id_partido);
       this.scrollToPlayerOnMobile();
-
     } catch (error) {
       console.error('Error al actualizar reproductor:', error);
     }
   },
 
-  /**
-   * Actualiza la información del partido en la UI
-   * @param {Object} partido 
-   */
+   setActiveLink(linkIndex, partidoId) {
+    // Remover clase active de todos los links
+    document.querySelectorAll('.links-list a.active').forEach(el => 
+      el.classList.remove('active')
+    );
+
+    // Activar el link específico del partido actual
+    const matchElement = DOMElements.gamelist.querySelector(`[data-id="${partidoId}"]`);
+    if (matchElement) {
+      const linkElement = matchElement.querySelector(`.links-list li:nth-child(${linkIndex + 1}) a`);
+      if (linkElement) {
+        linkElement.classList.add('active');
+      }
+    }
+  },
+
   updateMatchInfo(partido) {
     if (DOMElements.tournamentElem) {
       DOMElements.tournamentElem.textContent = Utils.sanitizeText(partido.torneo || '');
@@ -248,42 +247,27 @@ const MatchManager = {
     }
   },
 
-  /**
-   * Establece el partido activo visualmente
-   * @param {number|string} partidoId 
-   */
   setActiveMatch(partidoId) {
-    // Remover clase active de todos los elementos
-    document.querySelectorAll('.match.active').forEach(el =>
+    // Remover clases activas
+    document.querySelectorAll('.match.active, .links-list.active').forEach(el =>
       el.classList.remove('active')
     );
 
-    document.querySelectorAll('.links-list.active').forEach(el =>
-      el.classList.remove('active')
-    );
     // Activar el partido actual
     if (DOMElements.gamelist) {
-      const matchElement = DOMElements.gamelist.querySelector(
-        `[data-id="${partidoId}"]`
-      );
+      const matchElement = DOMElements.gamelist.querySelector(`[data-id="${partidoId}"]`);
       if (matchElement) {
         matchElement.classList.add('active');
       }
     }
   },
 
-  /**
-   * Scroll suave al reproductor en dispositivos móviles
-   */
   scrollToPlayerOnMobile() {
     if (window.innerWidth <= CONFIG.BREAKPOINTS.MOBILE && DOMElements.playerBox) {
       DOMElements.playerBox.scrollIntoView({ behavior: 'smooth' });
     }
   },
 
-  /**
-   * Recarga el frame actual
-   */
   reloadFrame() {
     if (DOMElements.iframe && DOMElements.iframe.src) {
       DOMElements.iframe.src = DOMElements.iframe.src;
@@ -295,10 +279,6 @@ const MatchManager = {
 // RENDERIZADO DE LISTA
 // ================================
 const ListRenderer = {
-  /**
-   * Renderiza la lista completa de partidos
-   * @param {Array} partidos 
-   */
   renderizarLista(partidos) {
     if (!DOMElements.gamelist) {
       console.error('Elemento gamelist no encontrado');
@@ -320,99 +300,87 @@ const ListRenderer = {
     partidos.forEach(partido => this.renderMatchItem(partido));
   },
 
-  /**
-   * Renderiza un elemento de partido individual
-   * @param {Object} partido 
-   */
-renderMatchItem(partido) {
-  if (!partido || !partido.id_partido) return;
+  renderMatchItem(partido) {
+    if (!partido || !partido.id_partido) return;
 
-  const horaLocal = Utils.convertirHoraLocal(partido.hora);
-  const li = document.createElement('li');
+    const horaLocal = Utils.convertirHoraLocal(partido.hora);
+    const li = document.createElement('li');
 
-  li.classList.add('match');
-  li.dataset.id = partido.id_partido;
+    li.classList.add('match');
+    li.dataset.id = partido.id_partido;
 
-  li.innerHTML = `
-    <div class="match-header">
-      <div class="match-info">
-        <div id="match-info-tournament-hour">
-          <p class="tournament">${Utils.sanitizeText(partido.torneo || '')}</p>
-          <p class="tournament">|</p>
-          <p class="hour">${horaLocal}</p>
+    li.innerHTML = `
+      <div class="match-header">
+        <div class="match-info">
+          <div id="match-info-tournament-hour">
+            <p class="tournament">${Utils.sanitizeText(partido.torneo || '')}</p>
+            <p class="tournament">|</p>
+            <p class="hour">${horaLocal}</p>
+          </div>
+          <div id="match-info-teams">
+            <p class="teams">${Utils.sanitizeText(partido.equipos || '')}</p>
+          </div>
         </div>
-        <div id="match-info-teams">
-          <p class="teams">${Utils.sanitizeText(partido.equipos || '')}</p>
+        <div id="match-info-img">
+          <img src="assets/images/play.svg" alt="Mostrar opciones">
         </div>
       </div>
-      <div id="match-info-img">
-        <img src="assets/images/play.svg" alt="Mostrar opciones">
-      </div>
-    </div>
-    <ul class="links-list"></ul>
-  `;
+      <ul class="links-list"></ul>
+    `;
 
-  // Sub-lista de links
-  const linksList = li.querySelector('.links-list');
-  partido.links.forEach((link, i) => {
-    const option = document.createElement('li');
-    option.innerHTML = `<a href="#">Opción ${i + 1}</a>`;
-    option.addEventListener('click', (e) => {
-      e.preventDefault();
-      MatchManager.actualizarPlayer({ ...partido, link });
-    });
-    linksList.appendChild(option);
-  });
+    this.createLinksSublist(li, partido);
+    this.addMatchEventListeners(li, partido);
 
+    // Reproducir automáticamente el primer partido si no hay otros
     if (DOMElements.gamelist.children.length === 0 && partido.links.length > 0) {
-    MatchManager.actualizarPlayer({ ...partido, link: partido.links[0] });
-  }
-
-  // Toggle de visibilidad al hacer clic en el header
-  const header = li.querySelector('.match-header');
-  header.addEventListener('click', () => {
-   const isActive = linksList.classList.contains('open')
-    document.querySelectorAll('.links-list').forEach(list => {
-    list.classList.remove('open');
-  });
-    MatchManager.actualizarPlayer({ ...partido, link: partido.links[0] });
-     if (!isActive) {
-    linksList.classList.add('open');
-  }
-  });
-
-  DOMElements.gamelist.appendChild(li);
-}
-,
-
-  /**
-   * Agrega event listener a un elemento de partido
-   * @param {HTMLElement} element 
-   * @param {Object} partido 
-   * 
-    MatchManager.updateMatchInfo(partido);
-    MatchManager.setActiveMatch(partido.id_partido)
-   */
-  addMatchEventListener(element, partido) {
-    const anchor = element.querySelector('a');
-    if (anchor) {
-      anchor.addEventListener('click', (e) => {
-        e.preventDefault();
-        MatchManager.actualizarPlayer(partido);
-      });
+      MatchManager.actualizarPlayer({ ...partido, link: partido.links[0] });
     }
+
+    DOMElements.gamelist.appendChild(li);
   },
 
-  /**
-   * Renderiza estado vacío
-   */
+    createLinksSublist(li, partido) {
+    const linksList = li.querySelector('.links-list');
+    
+    partido.links.forEach((link, i) => {
+      const option = document.createElement('li');
+      option.innerHTML = `<a href="#" data-link-index="${i}">Opción ${i + 1}</a>`;
+      
+      option.addEventListener('click', (e) => {
+        e.preventDefault();
+        MatchManager.actualizarPlayer({ ...partido, link }, i);
+      });
+      
+      linksList.appendChild(option);
+    });
+  },
+
+  addMatchEventListeners(li, partido) {
+    const header = li.querySelector('.match-header');
+    const linksList = li.querySelector('.links-list');
+
+    header.addEventListener('click', () => {
+      const isActive = linksList.classList.contains('open');
+      
+      // Cerrar todas las listas abiertas
+      document.querySelectorAll('.links-list').forEach(list => {
+        list.classList.remove('open');
+      });
+
+      // Reproducir el primer link del partido
+      MatchManager.actualizarPlayer({ ...partido, link: partido.links[0] }, 0);
+
+      // Abrir la lista si no estaba activa
+      if (!isActive) {
+        linksList.classList.add('open');
+      }
+    });
+  },
+
   renderEmptyState() {
     DOMElements.gamelist.innerHTML = '<li class="empty-state">No hay partidos disponibles hoy.</li>';
   },
 
-  /**
-   * Renderiza estado de error
-   */
   renderErrorState() {
     DOMElements.gamelist.innerHTML = '<li class="error-state">Error al cargar partidos.</li>';
   }
@@ -422,29 +390,25 @@ renderMatchItem(partido) {
 // BÚSQUEDA
 // ================================
 const SearchManager = {
-  /**
-   * Maneja la búsqueda de partidos
-   * @param {Event} e 
-   */
   searchMatch(e) {
     const searchTerm = e.target.value.trim().toLowerCase();
 
     if (!searchTerm) {
-      ListRenderer.renderizarLista(AppState.getPartidos());
-      MatchManager.setActiveMatch(AppState.getPartidos()[0].id_partido);
+      const partidos = AppState.getPartidos();
+      ListRenderer.renderizarLista(partidos);
+      if (partidos.length > 0) {
+        MatchManager.setActiveMatch(partidos[0].id_partido);
+      }
       return;
     }
 
     const results = this.filterMatches(searchTerm);
     ListRenderer.renderizarLista(results);
-    MatchManager.setActiveMatch(results[0].id_partido);
+    if (results.length > 0) {
+      MatchManager.setActiveMatch(results[0].id_partido);
+    }
   },
 
-  /**
-   * Filtra partidos por término de búsqueda
-   * @param {string} searchTerm 
-   * @returns {Array}
-   */
   filterMatches(searchTerm) {
     return AppState.getPartidos().filter(match => {
       const teams = (match.equipos || '').toLowerCase();
@@ -458,9 +422,6 @@ const SearchManager = {
 // LAYOUT RESPONSIVO
 // ================================
 const ResponsiveManager = {
-  /**
-   * Maneja el layout responsivo
-   */
   handleResponsiveLayout() {
     const body = document.body;
     const width = window.innerWidth;
@@ -481,20 +442,10 @@ const ResponsiveManager = {
     console.log(`Layout: ${width}x${height}, Ratio: ${aspectRatio.toFixed(2)}`);
   },
 
-  /**
-   * Limpia clases de layout previas
-   * @param {HTMLElement} body 
-   */
   clearLayoutClasses(body) {
     body.classList.remove('layout-mobile', 'layout-tablet', 'layout-desktop', 'webview-android');
   },
 
-  /**
-   * Aplica layout basado en dimensiones
-   * @param {HTMLElement} body 
-   * @param {number} width 
-   * @param {number} aspectRatio 
-   */
   applyLayout(body, width, aspectRatio) {
     if (width < CONFIG.BREAKPOINTS.MOBILE) {
       body.classList.add('layout-mobile');
@@ -505,9 +456,6 @@ const ResponsiveManager = {
     }
   },
 
-  /**
-   * Inicializa el manejo responsivo
-   */
   init() {
     // Event listeners
     window.addEventListener('load', () => this.handleResponsiveLayout());
@@ -516,7 +464,7 @@ const ResponsiveManager = {
       setTimeout(() => this.handleResponsiveLayout(), 100);
     });
 
-    // Para WebView Android
+    // Para WebView Android - verificación periódica
     if (Utils.isWebViewAndroid()) {
       setInterval(() => this.handleResponsiveLayout(), CONFIG.RESPONSIVE_CHECK_INTERVAL);
     }
@@ -524,13 +472,9 @@ const ResponsiveManager = {
 };
 
 // ================================
-// API MANAGER
+// MANEJO DE API
 // ================================
 const APIManager = {
-  /**
-   * Obtiene partidos desde la API
-   * @returns {Promise<Array>}
-   */
   async fetchPartidos() {
     try {
       const response = await fetch(CONFIG.API_URL);
@@ -541,11 +485,29 @@ const APIManager = {
 
       const partidos = await response.json();
       return Array.isArray(partidos) ? partidos : [];
-
     } catch (error) {
       console.error('Error al cargar partidos:', error);
       throw error;
     }
+  },
+
+  groupMatches(partidos) {
+    return Object.values(
+      partidos.reduce((acc, item) => {
+        const key = `${item.equipos}`;
+        if (!acc[key]) {
+          acc[key] = {
+            id_partido: item.id_partido,
+            hora: item.hora,
+            torneo: item.torneo,
+            equipos: item.equipos,
+            links: []
+          };
+        }
+        acc[key].links.push(item.link);
+        return acc;
+      }, {})
+    );
   }
 };
 
@@ -553,126 +515,80 @@ const APIManager = {
 // INICIALIZADOR PRINCIPAL
 // ================================
 const App = {
-  /**
-   * Inicializa la aplicación
-   */
   async init() {
     try {
-      // Inicializar elementos DOM
       DOMElements.init();
-
-      // Configurar event listeners
       this.setupEventListeners();
-
-      // Inicializar layout responsivo
       ResponsiveManager.init();
-
-      // Cargar partidos
+      PopunderManager.init();
       await this.loadMatches();
-
     } catch (error) {
       console.error('Error al inicializar la aplicación:', error);
       this.handleInitError();
     }
   },
 
-  /**
-   * Configura event listeners
-   */
   setupEventListeners() {
-    // Botón de recarga
     if (DOMElements.reloadButton) {
       DOMElements.reloadButton.onclick = () => MatchManager.reloadFrame();
     }
 
-    // Input de búsqueda
     if (DOMElements.inputSearch) {
       DOMElements.inputSearch.addEventListener('input', (e) => SearchManager.searchMatch(e));
     }
   },
 
-  /**
-   * Carga los partidos desde la API
-   */
   async loadMatches() {
     try {
-      // Mostrar loader
-      if (DOMElements.loader) {
-        DOMElements.loader.style.display = "flex";
-      }
+      this.showLoader();
 
-      const partidos = await APIManager.fetchPartidos();
+      const partidosRaw = await APIManager.fetchPartidos();
+      const grouped = APIManager.groupMatches(partidosRaw);
 
-      const grouped = Object.values(
-        partidos.reduce((acc, item) => {
-          const key = `${item.equipos}`;
-          if (!acc[key]) {
-            // Si no existe, lo creamos
-            acc[key] = {
-              id_partido: item.id_partido,
-              hora: item.hora,
-              torneo: item.torneo,
-              equipos: item.equipos,
-              links: []
-            };
-          }
-          // Agregamos el link al arreglo
-          acc[key].links.push(item.link);
-          return acc;
-        }, {})
-      );
+      console.log('Partidos agrupados:', JSON.stringify(grouped, null, 2));
 
-      console.log(JSON.stringify(grouped))
+      this.hideLoader();
 
-      // Ocultar loader
-      if (DOMElements.loader) {
-        DOMElements.loader.style.display = "none";
-      }
-
-      // Guardar estado y renderizar
       AppState.setPartidos(grouped);
 
       if (grouped.length > 0) {
-      ListRenderer.renderizarLista(grouped);
-      MatchManager.actualizarPlayer(grouped[0]);
-      MatchManager.setActiveMatch(grouped[0].id_partido);
+        ListRenderer.renderizarLista(grouped);
+        MatchManager.actualizarPlayer(grouped[0], 0); 
+        MatchManager.setActiveMatch(grouped[0].id_partido);
+        MatchManager.setActiveLink(0, grouped[0].id_partido);
       } else {
         ListRenderer.renderEmptyState();
       }
-
     } catch (error) {
-      // Ocultar loader
-      if (DOMElements.loader) {
-        DOMElements.loader.style.display = "none";
-      }
-
+      this.hideLoader();
       ListRenderer.renderErrorState();
       throw error;
     }
   },
 
-  /**
-   * Maneja errores de inicialización
-   */
-  handleInitError() {
+  showLoader() {
+    if (DOMElements.loader) {
+      DOMElements.loader.style.display = "flex";
+    }
+  },
+
+  hideLoader() {
     if (DOMElements.loader) {
       DOMElements.loader.style.display = "none";
     }
+  },
 
+  handleInitError() {
+    this.hideLoader();
     if (DOMElements.gamelist) {
       DOMElements.gamelist.innerHTML = '<li class="error-state">Error al inicializar la aplicación.</li>';
     }
   }
 };
 
-/*document.getElementById("close-btn").addEventListener("click", function() {
-document.getElementById("notice").style.display = "none";})*/
-
 // ================================
 // INICIALIZACIÓN
 // ================================
-
-// Inicializar cuando el DOM esté listo
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => App.init());
 } else {

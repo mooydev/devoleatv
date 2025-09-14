@@ -56,10 +56,16 @@
     <script src="assets/scripts/luxon.min.js"></script>
     <!-- POPUNDER ADD -->
     <!--<script type='text/javascript' src='//pl27491481.profitableratecpm.com/8d/ed/7e/8ded7ea6c06ca8dbdd225401e42475f4.js'></script>-->
+    <link rel="icon" type="image/png" href="assets/images/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+    <link rel="shortcut icon" href="assets/images/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="DeVoleaTV" />
+    <link rel="manifest" href="assets/images/site.webmanifest" />
 </head>
 
 <body>
-  <!--<div id="notice">
+    <!--<div id="notice">
     <div class="content">
       <button id="close-btn">✖</button>
       <div><p>HOLA MUNDO</p></div>
@@ -86,29 +92,31 @@
     <main>
         <div class="player-box">
             <iframe id="main-frame" src="" allowfullscreen loading="lazy" title="Reproductor en vivo">
-            </div>
-            </iframe>
-            <div class="player-info">
-                <div class="match-a">
-                    <div class="match-info">
-                        <div id="match-info-tournament-hour">
-                            <p class="tournament">Sin datos</p>
-                            <p class="tournament">|</p>
-                            <p class="hour">00:00</p>
-                        </div>
-                        <div id="match-info-teams">
-                            <p class="teams" id="teams-player"></p>
-                        </div>
+        </div>
+        </iframe>
+        <div class="player-info">
+            <div class="match-a">
+                <div class="match-info">
+                    <div id="match-info-tournament-hour">
+                        <p class="tournament">Sin datos</p>
+                        <p class="tournament">|</p>
+                        <p class="hour">00:00</p>
                     </div>
-                    <div id="match-info-img">
-                        <button type="submit" id="match-info-img-button" onclick="reloadFrame()">
-                            <img src="assets/images/update.svg" alt="Recargar Reproductor" />
-                        </button>
+                    <div id="match-info-teams">
+                        <p class="teams" id="teams-player"></p>
                     </div>
                 </div>
+                <div id="match-info-img">
+                    <button type="submit" id="match-info-img-button" onclick="reloadFrame()">
+                        <img src="assets/images/update.svg" alt="Recargar Reproductor" />
+                    </button>
+                </div>
             </div>
-            <p style="font-size: 0.5rem; margin: 0.5rem;">Este sitio puede abrir hasta 3 ventanas de contenido patrocinado, para continuar al contenido
-                usted puede cerrarlas. Los anuncios de las opciones de video son independientes a esta web, considerelos.</p>
+        </div>
+        <p style="font-size: 0.5rem; margin: 0.5rem;">Este sitio puede abrir hasta 3 ventanas de contenido patrocinado,
+            para continuar al contenido
+            usted puede cerrarlas. Los anuncios de las opciones de video son independientes a esta web, considerelos.
+        </p>
         </div>
         <div class="gamelist">
             <div class="gamelist-search">
@@ -116,6 +124,7 @@
                 <input type="text" name="search" id="search" placeholder="Equipo, liga...">
             </div>
             <div id="loader">
+                <p>Esto puede tardar un momento.</p>
                 <div class="spinner"></div>
             </div>
             <ul>
