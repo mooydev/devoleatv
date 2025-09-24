@@ -220,18 +220,12 @@ header img {
   align-items: center;
   width: 100%;
 }
-/*
+
 .links-list li a.active {
-  background-color: #007bff;
-  color: white;
-  font-weight: bold;
-  border-left: 3px solid #0056b3;
-}
-*/
-/* O con un indicador visual más sutil */
-.links-list li a.active::before {
-  content: "▶ ";
-  color: var(--color-primary);
+  color: var(--color-text);
+  border-radius: .4rem;
+  background: var(--color-primary);
+  padding: .3rem;
 }
 
 img {
