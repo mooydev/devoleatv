@@ -1,4 +1,3 @@
-
 // ================================
 // CONFIGURACIÓN Y CONSTANTES
 // ================================
@@ -12,7 +11,8 @@ const CONFIG = {
   },
   RESPONSIVE_CHECK_INTERVAL: 1000,
   POPUNDER_OPEN_INTERVAL: 7000,
-  POPUNDER_LIMIT: 3
+  POPUNDER_LIMIT: 3,
+  IFRAME_LOAD_TIMEOUT: 15000 // Timeout de 15 segundos
 };
 
 // ================================
@@ -28,6 +28,8 @@ const DOMElements = {
   reloadButton: null,
   loader: null,
   inputSearch: null,
+  iframeLoading: null,
+  iframeError: null,
 
   init() {
     this.iframe = document.getElementById('main-frame');
@@ -40,8 +42,51 @@ const DOMElements = {
     this.loader = document.getElementById("loader");
     this.inputSearch = document.getElementById("search");
 
+    // Crear elementos para loading y error del iframe
+    this.createIframeOverlays();
     this.validateElements();
   },
+
+ createIframeOverlays() {
+  // Buscar el contenedor del iframe
+  const iframeContainer = document.querySelector('.iframe-container');
+  
+  if (!iframeContainer) {
+    console.error('No se encontró .iframe-container');
+    return;
+  }
+
+  // Contenedor para loading del iframe
+  this.iframeLoading = document.createElement('div');
+  this.iframeLoading.id = 'iframe-loading';
+  this.iframeLoading.className = 'iframe-overlay iframe-loading-overlay';
+  this.iframeLoading.innerHTML = `
+    <div class="iframe-loading-content">
+      <div class="iframe-spinner"></div>
+    </div>
+  `;
+
+  // Contenedor para error del iframe
+  this.iframeError = document.createElement('div');
+  this.iframeError.id = 'iframe-error';
+  this.iframeError.className = 'iframe-overlay iframe-error-overlay';
+  this.iframeError.innerHTML = `
+    <div class="iframe-error-content">
+      <h3 class="iframe-error-title">Error al cargar la transmisión</h3>
+      <p class="iframe-error-description">No se pudo cargar el recurso. Esto puede suceder por:</p>
+      <ul class="iframe-error-reasons">
+        <li>Algo en la red bloqueó el acceso</li>
+        <li>Conexión lenta o interrumpida</li>
+        <li>Stream no disponible o expirada</li>
+      </ul>
+      <p class="iframe-error-description">Prueba recargar el reproductor con el boton inferior derecho</p>
+    </div>
+  `;
+
+  // CAMBIO IMPORTANTE: Agregar al iframe-container, NO al player-box
+  iframeContainer.appendChild(this.iframeLoading);
+  iframeContainer.appendChild(this.iframeError);
+},
 
   validateElements() {
     const requiredElements = ['iframe', 'gamelist', 'loader'];
@@ -50,6 +95,70 @@ const DOMElements = {
     if (missingElements.length > 0) {
       console.warn('Elementos DOM faltantes:', missingElements);
     }
+  }
+};
+
+// ================================
+// MANEJO DEL IFRAME CON LOADING Y ERRORES
+// ================================
+const IframeManager = {
+  loadTimeout: null,
+
+  showLoading() {
+    if (DOMElements.iframeLoading) {
+      DOMElements.iframeLoading.style.display = 'flex';
+    }
+  },
+
+  hideLoading() {
+    if (DOMElements.iframeLoading) {
+      DOMElements.iframeLoading.style.display = 'none';
+    }
+  },
+
+  showError() {
+    if (DOMElements.iframeError) {
+      DOMElements.iframeError.style.display = 'flex';
+    }
+  },
+
+  hideError() {
+    if (DOMElements.iframeError) {
+      DOMElements.iframeError.style.display = 'none';
+    }
+  },
+
+  setLoadTimeout() {
+    this.clearLoadTimeout();
+    this.loadTimeout = setTimeout(() => {
+      if (DOMElements.iframeLoading.style.display === 'flex') {
+        this.showError();
+        this.hideLoading();
+      }
+    }, CONFIG.IFRAME_LOAD_TIMEOUT);
+  },
+
+  clearLoadTimeout() {
+    if (this.loadTimeout) {
+      clearTimeout(this.loadTimeout);
+      this.loadTimeout = null;
+    }
+  },
+
+  init() {
+    if (!DOMElements.iframe) return;
+
+    DOMElements.iframe.addEventListener('load', () => {
+      this.clearLoadTimeout();
+      this.hideLoading();
+      this.hideError();
+    });
+
+    DOMElements.iframe.addEventListener('error', () => {
+      this.clearLoadTimeout();
+      this.hideLoading();
+      this.showError();
+    });
   }
 };
 
@@ -203,6 +312,11 @@ const MatchManager = {
     }
 
     try {
+      // Mostrar loading
+      IframeManager.showLoading();
+      IframeManager.hideError();
+      IframeManager.setLoadTimeout();
+
       DOMElements.iframe.src = link;
       AppState.setCurrentStream(link);
       AppState.setActiveLink(linkIndex, partido.id_partido);
@@ -213,6 +327,8 @@ const MatchManager = {
       this.scrollToPlayerOnMobile();
     } catch (error) {
       console.error('Error al actualizar reproductor:', error);
+      IframeManager.hideLoading();
+      IframeManager.showError();
     }
   },
 
@@ -270,6 +386,9 @@ const MatchManager = {
 
   reloadFrame() {
     if (DOMElements.iframe && DOMElements.iframe.src) {
+      IframeManager.showLoading();
+      IframeManager.hideError();
+      IframeManager.setLoadTimeout();
       DOMElements.iframe.src = DOMElements.iframe.src;
     }
   }
@@ -382,7 +501,7 @@ const ListRenderer = {
   },
 
   renderErrorState() {
-    DOMElements.gamelist.innerHTML = '<li class="error-state">Error al cargar partidos.</li>';
+    DOMElements.gamelist.innerHTML = '<li class="error-state">Error al cargar partidos.<button class="button-normal" onclick="location.reload()">Reintentar</button></li>';
   }
 };
 
@@ -518,6 +637,7 @@ const App = {
   async init() {
     try {
       DOMElements.init();
+      IframeManager.init();
       this.setupEventListeners();
       ResponsiveManager.init();
       PopunderManager.init();
@@ -581,7 +701,7 @@ const App = {
   handleInitError() {
     this.hideLoader();
     if (DOMElements.gamelist) {
-      DOMElements.gamelist.innerHTML = '<li class="error-state">Error al inicializar la aplicación.</li>';
+      DOMElements.gamelist.innerHTML = '<li class="error-state">Error al iniciar la aplicación. <button class="button-normal" onclick="location.reload()">Reintentar</button></li>';
     }
   }
 };

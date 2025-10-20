@@ -80,16 +80,9 @@ header img {
   justify-content: center;
   width: 100%;
   flex-shrink: 0;
+  position: relative; /* Mantener esto */
 }
 
-.player-box iframe {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  border: none;
-  border-radius: var(--border-radius) var(--border-radius) 0 0;
-  max-width: 100%;
-  height: auto;
-}
 
 .player-info {
   display: flex;
@@ -169,9 +162,9 @@ header img {
     background-color: var(--color-bg);
     background-image: url('../images/search.svg');
     background-repeat: no-repeat;
-    width:5%;
+    width:1rem;
     height: 1.8rem;
-    padding: .3rem .3rem .3rem 1.8rem;
+    padding: .3rem .3rem .3rem 1.5rem;
     border-width: 0 0 2px 0;
     border-color: var(--color-text);
     transition: width 0.4s ease-in-out;
@@ -272,9 +265,156 @@ footer {
   box-shadow: var(--box-shadow-inset);
 }
 
+.error-state{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.button-normal{
+  color: var(--color-text);
+  cursor:pointer;
+  background-color:var(--color-primary);
+  border: none;
+  border-radius: 1rem;
+  padding: 0.6rem;
+  transition: all 0.3s ease;
+}
+
+.button-normal:active {
+  transform: translateY(0);
+}
+
 @keyframes girar {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* ================================
+   ESTILOS PARA IFRAME LOADING Y ERROR
+================================ */
+
+/* Overlay base para el iframe */
+.iframe-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Overlay de Loading */
+.iframe-loading-overlay {
+background: rgba(0, 0, 0, 0.99);
+}
+
+.iframe-loading-content {
+display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.iframe-spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 4px solid rgb(255, 255, 255);
+  border-top: 4px solid var(--color-primary);
+  border-radius: 50%;
+  animation: iframe-spin 1s linear infinite;
+}
+
+@keyframes iframe-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.iframe-loading-text {
+  color: var(--color-text);
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* NUEVO: Contenedor específico del iframe */
+.iframe-container {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+
+/* Overlay de Error */
+.iframe-error-overlay {
+  background: var(--color-bg);
+  padding: 20px;
+}
+
+.iframe-error-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 80%;
+}
+
+.iframe-error-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  animation: error-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes error-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.iframe-error-title {
+  color: var(--color-text);
+      font-size: 0.9rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  margin: 0 0 0.5em 0;
+}
+
+.iframe-error-description {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.7rem;
+  margin-bottom: 0.5rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.iframe-error-reasons {
+  list-style: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.6rem;
+    list-style-type: disc;
+  margin-bottom: 0.4rem;
+  padding: 0;
+  text-align: left;
+}
+
+.iframe-error-reasons li {
+  margin: 0.5rem 0;
+  position: relative;
+}
+
+
+/* Asegurar que el player-box sea relativo para que los overlays funcionen correctamente */
+.player-box {
+  position: relative;
 }
 
 /* ===========================================
@@ -285,16 +425,20 @@ footer {
 .layout-desktop main {
   display: grid !important;
   grid-template-columns: 60% 40% !important;
-  grid-template-rows: repeat(2, 1fr) !important;
+  grid-template-rows: 1fr !important;
   gap: 0.5rem !important;
 }
 
 .layout-desktop .player-box {
-  justify-content: flex-start;
+  justify-content: center;
+      max-height: 80%;
 }
 
-.layout-desktop .player-box iframe {
-  aspect-ratio: 21 / 9 !important;
+.layout-desktop .gamelist{
+  max-height: 90%
+}
+.layout-desktop .iframe-container {
+  aspect-ratio: 16 / 9 !important;
 }
 
 .layout-desktop .ad {
@@ -308,6 +452,7 @@ footer {
   max-width: 20%;
 }
 
+
 /* Layout Móvil - Siempre flexbox vertical */
 .layout-mobile main,
 .webview-android main {
@@ -317,8 +462,8 @@ footer {
   grid-template-rows: none !important;
 }
 
-.layout-mobile .player-box iframe,
-.webview-android .player-box iframe {
+.layout-mobile .iframe-container,
+.webview-android .iframe-container {
   aspect-ratio: 16/9 !important;
 }
 

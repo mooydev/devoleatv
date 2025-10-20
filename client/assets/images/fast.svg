@@ -1,0 +1,44 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" width="36px" height="36px"
+    viewBox="0 0 30 30" version="1.1" id="svg822" inkscape:version="0.92.4 (f8dce91, 2019-08-02)"
+    sodipodi:docname="flash-on.svg" fill="#ffffff" stroke="#ffffff">
+
+    <g id="SVGRepo_bgCarrier" stroke-width="0" />
+
+    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round" />
+
+    <g id="SVGRepo_iconCarrier">
+        <defs id="defs816" />
+        <sodipodi:namedview id="base" pagecolor="#ffffff" bordercolor="#666666" borderopacity="1.0"
+            inkscape:pageopacity="0.0" inkscape:pageshadow="2" inkscape:zoom="17.833333"
+            inkscape:cx="7.4859812" inkscape:cy="15" inkscape:document-units="px"
+            inkscape:current-layer="layer1" showgrid="true" units="px" inkscape:window-width="1366"
+            inkscape:window-height="713" inkscape:window-x="0" inkscape:window-y="0"
+            inkscape:window-maximized="1">
+            <inkscape:grid type="xygrid" id="grid816" />
+        </sodipodi:namedview>
+        <metadata id="metadata819">
+            <rdf:rdf>
+                <cc:work rdf:about="">
+                    <dc:format>image/svg+xml</dc:format>
+                    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                    <dc:title />
+                </cc:work>
+            </rdf:rdf>
+        </metadata>
+        <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1"
+            transform="translate(0,-289.0625)">
+            <path
+                style="opacity:1; fill:#FFFFFF; fill-opacity:1; stroke:#ffffff; stroke-width:2; stroke-miterlimit:4; stroke-dasharray:none; stroke-opacity:1"
+                d="m 21.185547,3.0019531 c 0,0 -8.764468,10.8011299 -9.201172,11.7187499 -0.26873,1.04979 0.891999,1.953125 2,1.953125 0.184666,0 0.393629,-1.5e-4 0.597656,0 L 10,27 c 0,0 8.762514,-10.80113 9.199219,-11.71875 0.268729,-1.04979 -0.892,-1.953125 -2,-1.953125 -0.184667,0 -0.393631,1.5e-4 -0.597657,0 z"
+                transform="translate(0,289.0625)" id="rect1485" inkscape:connector-curvature="0"
+                sodipodi:nodetypes="ccscccscc" />
+        </g>
+    </g>
+
+</svg>
