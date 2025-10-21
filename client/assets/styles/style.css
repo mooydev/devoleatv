@@ -21,6 +21,7 @@
 @font-face {
   font-family: "Roboto Condensed";
   src: url('../fonts/RobotoCondensed-VariableFont_wght.ttf') format('truetype');
+  font-display: swap; /* ← Importante */
 }
 
 html {
