@@ -72,12 +72,12 @@ const DOMElements = {
   this.iframeError.className = 'iframe-overlay iframe-error-overlay';
   this.iframeError.innerHTML = `
     <div class="iframe-error-content">
-      <h3 class="iframe-error-title">Error al cargar la transmisión</h3>
+      <h3 class="iframe-error-title">ERROR</h3>
       <p class="iframe-error-description">No se pudo cargar el recurso. Esto puede suceder por:</p>
       <ul class="iframe-error-reasons">
         <li>Algo en la red bloqueó el acceso</li>
         <li>Conexión lenta o interrumpida</li>
-        <li>Stream no disponible o expirada</li>
+        <li>Stream no disponible o expirado</li>
       </ul>
       <p class="iframe-error-description">Prueba recargar el reproductor con el boton inferior derecho</p>
     </div>
@@ -293,6 +293,120 @@ const PopunderManager = {
         DOMElements.gamelist.addEventListener('touchstart', this.open);
       }
     });
+  }
+};
+
+// ================================
+// MANEJO DEL NOTICE/MODAL
+// ================================
+const NoticeManager = {
+  STORAGE_KEY: 'devoleatv_notice_closed',
+  NOTICE_VERSION: 'android_app_v1', // Cambia esto cuando quieras mostrar un nuevo aviso
+
+  isAndroidApp() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    
+    const isAndroid = /android/i.test(userAgent);
+    const isWebView = /wv|webview/i.test(userAgent);
+    
+    
+    const isDeVoleaApp = window.DeVoleaApp !== undefined; // por ver en app
+    
+    return (isAndroid && isWebView) || isDeVoleaApp;
+  },
+
+  hasClosedNotice() {
+    try {
+      const closedVersion = localStorage.getItem(this.STORAGE_KEY);
+      return closedVersion === this.NOTICE_VERSION;
+    } catch (e) {
+      console.warn('LocalStorage no disponible:', e);
+      return false;
+    }
+  },
+
+  markAsClosed() {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, this.NOTICE_VERSION);
+    } catch (e) {
+      console.warn('No se pudo guardar en LocalStorage:', e);
+    }
+  },
+
+  shouldShowNotice() {
+    if (this.isAndroidApp()) {
+      console.log('Usuario en app Android - Notice oculto');
+      return false;
+    }
+
+    if (this.hasClosedNotice()) {
+      console.log('Usuario ya cerró el notice - Notice oculto');
+      return false;
+    }
+
+    return true;
+  },
+
+  show() {
+    const notice = document.getElementById('notice');
+    if (notice) {
+      notice.classList.add('show');
+    }
+  },
+
+  hide() {
+    const notice = document.getElementById('notice');
+    if (notice) {
+      notice.classList.remove('show');
+      this.markAsClosed();
+    }
+  },
+
+  init() {
+    const closeBtn = document.getElementById('close-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const notice = document.getElementById('notice');
+
+    if (!notice) {
+      console.warn('Elemento #notice no encontrado');
+      return;
+    }
+
+    // Event listener para cerrar
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => {
+        this.hide();
+      });
+    }
+
+    // Event listener para el botón de descarga
+    if (downloadBtn) {
+      downloadBtn.addEventListener('click', () => {
+        console.log('Usuario hizo clic en descargar app');
+        this.hide();
+      });
+    }
+
+    // Cerrar al hacer clic fuera del modal
+    notice.addEventListener('click', (e) => {
+      if (e.target === notice) {
+        this.hide();
+      }
+    });
+
+    // Cerrar con tecla ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && notice.classList.contains('show')) {
+        this.hide();
+      }
+    });
+
+    // Mostrar el notice si corresponde
+    if (this.shouldShowNotice()) {
+      setTimeout(() => {
+        this.show();
+      }, 1500);
+    }
   }
 };
 
@@ -638,6 +752,7 @@ const App = {
     try {
       DOMElements.init();
       IframeManager.init();
+      NoticeManager.init();
       this.setupEventListeners();
       ResponsiveManager.init();
       PopunderManager.init();
@@ -665,7 +780,6 @@ const App = {
       const partidosRaw = await APIManager.fetchPartidos();
       const grouped = APIManager.groupMatches(partidosRaw);
 
-      console.log('Partidos agrupados:', JSON.stringify(grouped, null, 2));
 
       this.hideLoader();
 
