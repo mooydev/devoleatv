@@ -1,6 +1,10 @@
-/* AL INICIO del archivo */
 body {
     opacity: 0;
+    transition: opacity 0.2s ease-in;
+}
+
+body.loaded {
+    opacity: 1;
 }
 
 /* ===========================================
@@ -38,7 +42,6 @@ body {
     color: var(--color-text);
     line-height: 1.6;
     overflow-x: hidden;
-    animation: fadeIn 1s ease;
 }
 
 .container {

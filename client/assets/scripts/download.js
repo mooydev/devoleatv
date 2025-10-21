@@ -1,3 +1,7 @@
+window.addEventListener('load', () => {
+    document.body.classList.add('loaded');
+});
+
 // ===========================================
 // DESCARGA DE APK (versión optimizada)
 // ===========================================
