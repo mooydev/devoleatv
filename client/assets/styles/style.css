@@ -357,7 +357,8 @@ display: flex;
 .iframe-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 21 / 9;
+  
 }
 
 .iframe-container iframe {
@@ -365,6 +366,7 @@ display: flex;
   height: 100%;
   border: none;
   border-radius: var(--border-radius) var(--border-radius) 0 0;
+  aspect-ratio: 21 / 9;
 }
 
 
