@@ -415,18 +415,29 @@ const NoticeManager = {
 // ================================
 const MatchManager = {
   actualizarPlayer(partido, linkIndex = 0) {
-    if (!partido || !DOMElements.iframe) {
-      console.error('Partido o iframe no válido');
-      return;
-    }
+  if (!partido || !DOMElements.iframe) {
+    console.error('Partido o iframe no válido');
+    return;
+  }
 
-    const link = partido.link || (partido.links && partido.links[linkIndex]);
-    if (!link || link === AppState.getCurrentStream()) {
-      return;
-    }
+  const link = partido.link || (partido.links && partido.links[linkIndex]);
+  
+  if (!link) {
+    console.error('Link no disponible');
+    return;
+  }
 
-    try {
-      // Mostrar loading
+  // CAMBIO CLAVE: Separar la actualización de info vs iframe
+  const isSameStream = link === AppState.getCurrentStream();
+
+  try {
+    // SIEMPRE actualizar la información del partido
+    this.updateMatchInfo(partido);
+    this.setActiveMatch(partido.id_partido);
+    this.setActiveLink(linkIndex, partido.id_partido);
+
+    // Solo recargar el iframe si el link es diferente
+    if (!isSameStream) {
       IframeManager.showLoading();
       IframeManager.hideError();
       IframeManager.setLoadTimeout();
@@ -434,17 +445,15 @@ const MatchManager = {
       DOMElements.iframe.src = link;
       AppState.setCurrentStream(link);
       AppState.setActiveLink(linkIndex, partido.id_partido);
-
-      this.updateMatchInfo(partido);
-      this.setActiveMatch(partido.id_partido);
-      this.setActiveLink(linkIndex, partido.id_partido);
-      this.scrollToPlayerOnMobile();
-    } catch (error) {
-      console.error('Error al actualizar reproductor:', error);
-      IframeManager.hideLoading();
-      IframeManager.showError();
     }
-  },
+
+    this.scrollToPlayerOnMobile();
+  } catch (error) {
+    console.error('Error al actualizar reproductor:', error);
+    IframeManager.hideLoading();
+    IframeManager.showError();
+  }
+},
 
    setActiveLink(linkIndex, partidoId) {
     // Remover clase active de todos los links
