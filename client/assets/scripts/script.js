@@ -72,7 +72,7 @@ const DOMElements = {
   this.iframeError.className = 'iframe-overlay iframe-error-overlay';
   this.iframeError.innerHTML = `
     <div class="iframe-error-content">
-      <h3 class="iframe-error-title">ERROR</h3>
+      <h3 class="iframe-error-title">ALGO SALIÓ MAL</h3>
       <p class="iframe-error-description">No se pudo cargar el recurso. Esto puede suceder por:</p>
       <ul class="iframe-error-reasons">
         <li>Algo en la red bloqueó el acceso</li>
@@ -251,6 +251,58 @@ const Utils = {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+  }
+};
+
+const DateUtils = {
+  parseMatchTime(horaUTCminus5, fecha = null) {
+    const { DateTime } = luxon;
+    const [h, m] = horaUTCminus5.split(':').map(Number);
+    
+    let year, month, day;
+    
+    if (fecha) {
+      const dateObj = new Date(fecha);
+      year = dateObj.getUTCFullYear();
+      month = dateObj.getUTCMonth() + 1; // getUTCMonth() devuelve 0-11
+      day = dateObj.getUTCDate();
+    } else {
+      const now = DateTime.now();
+      year = now.year;
+      month = now.month;
+      day = now.day;
+    }
+    
+    // Crear fecha/hora en UTC-5
+    const matchTimeUTC5 = DateTime.fromObject(
+      { 
+        year: year,
+        month: month,
+        day: day,
+        hour: h, 
+        minute: m,
+        second: 0,
+        millisecond: 0
+      },
+      { zone: 'UTC-5' }
+    );
+    
+    const localTime = matchTimeUTC5.setZone('local');
+    
+    return localTime;
+  },
+
+  isMatchExpired(horaUTCminus5, fecha = null) {
+    const matchTime = this.parseMatchTime(horaUTCminus5, fecha);
+    const now = luxon.DateTime.now();
+    const duration = now.diff(matchTime, 'minutes').minutes;
+    return duration > 135;
+  },
+
+  compareMatchTimes(horaA, fechaA, horaB, fechaB) {
+    const timeA = this.parseMatchTime(horaA, fechaA);
+    const timeB = this.parseMatchTime(horaB, fechaB);
+    return timeA.toMillis() - timeB.toMillis();
   }
 };
 
@@ -620,11 +672,11 @@ const ListRenderer = {
   },
 
   renderEmptyState() {
-    DOMElements.gamelist.innerHTML = '<li class="empty-state">No hay partidos disponibles hoy.</li>';
+    DOMElements.gamelist.innerHTML = '<li class="empty-state">Parece que no hay eventos en este momento.</li>';
   },
 
   renderErrorState() {
-    DOMElements.gamelist.innerHTML = '<li class="error-state">Error al cargar partidos.<button class="button-normal" onclick="location.reload()">Reintentar</button></li>';
+    DOMElements.gamelist.innerHTML = '<li class="error-state">Algo salió mal al intentar obtener los eventos.<button class="button-normal" onclick="location.reload()">Reintentar</button></li>';
   }
 };
 
@@ -733,14 +785,15 @@ const APIManager = {
     }
   },
 
-  groupMatches(partidos) {
-    return Object.values(
+groupMatches(partidos) {
+    const grouped = Object.values(
       partidos.reduce((acc, item) => {
         const key = `${item.equipos}`;
         if (!acc[key]) {
           acc[key] = {
             id_partido: item.id_partido,
             hora: item.hora,
+            fecha: item.fecha,
             torneo: item.torneo,
             equipos: item.equipos,
             links: []
@@ -750,13 +803,41 @@ const APIManager = {
         return acc;
       }, {})
     );
-  }
+
+    return this.filterAndSortMatches(grouped);
+  },
+
+filterAndSortMatches(partidos) {
+  console.log('=== DEBUG filterAndSortMatches ===');
+  console.log('Partidos recibidos:', partidos.length);
+  console.log('Datos de partidos:', partidos);
+  
+  // Verificar cada partido
+  const active = partidos.filter(p => {
+    const isExpired = DateUtils.isMatchExpired(p.hora, p.fecha);
+    console.log(`Partido: ${p.equipos}`);
+    console.log(`  Hora API: ${p.hora}`);
+    console.log(`  Fecha API: ${p.fecha}`);
+    console.log(`  ¿Expirado?: ${isExpired}`);
+    return !isExpired;
+  });
+
+  console.log('Partidos activos después de filtrar:', active.length);
+  console.log('=== FIN DEBUG ===');
+
+  active.sort((a, b) => 
+    DateUtils.compareMatchTimes(a.hora, a.fecha, b.hora, b.fecha)
+  );
+
+  return active;
+}
 };
 
 // ================================
 // INICIALIZADOR PRINCIPAL
 // ================================
 const App = {
+  refreshInterval: null,
   async init() {
     try {
       DOMElements.init();
@@ -765,6 +846,7 @@ const App = {
       this.setupEventListeners();
       ResponsiveManager.init();
       PopunderManager.init();
+      this.startAutoRefresh();
       await this.loadMatches();
     } catch (error) {
       console.error('Error al inicializar la aplicación:', error);
@@ -825,6 +907,32 @@ const App = {
     this.hideLoader();
     if (DOMElements.gamelist) {
       DOMElements.gamelist.innerHTML = '<li class="error-state">Error al iniciar la aplicación. <button class="button-normal" onclick="location.reload()">Reintentar</button></li>';
+    }
+  },
+
+  startAutoRefresh() {
+    // Revisar cada 5 minutos si hay partidos que ocultar
+    this.refreshInterval = setInterval(() => {
+      const current = AppState.getPartidos();
+      const filtered = APIManager.filterAndSortMatches(current);
+      
+      if (filtered.length !== current.length) {
+        console.log('Actualizando lista: partidos vencidos removidos');
+        AppState.setPartidos(filtered);
+        ListRenderer.renderizarLista(filtered);
+        
+        // Si el partido actual venció, cargar el siguiente
+        if (filtered.length > 0) {
+          MatchManager.actualizarPlayer(filtered[0], 0);
+        }
+      }
+    }, 5 * 60 * 1000); // 5 minutos
+  },
+
+  // Limpiar al cerrar
+  destroy() {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
     }
   }
 };
