@@ -29,7 +29,10 @@ pool.on('connect', (client) => {
 export async function obtenerPartidosDeHoy() {
   const client = await pool.connect();
   try{
-    const query = 'SELECT * FROM partidos';
+    const query = `
+  SELECT id_partido, to_char(fecha, 'YYYY-MM-DD') AS fecha, torneo, hora, equipos, link
+  FROM partidos
+`;
     const { rows } = await client.query(query);
 
     return rows;

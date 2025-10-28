@@ -8,9 +8,9 @@
     <meta name="mobile-web-app-capable" content="yes" />
 
     <!-- SEO Meta Tags -->
-    <title>DeVoleaTV | Transmisiones Deportivas en Vivo - Fútbol y Más</title>
+    <title>DeVoleaTV | Fútbol en Vivo Gratis y Transmisiones Deportivas Online</title>
     <meta name="description"
-        content="Disfruta de los mejores partidos de fútbol en vivo gratis. DeVoleaTV te ofrece transmisiones deportivas de alta calidad las 24 horas.">
+        content="Descarga la app oficial de DeVoleaTV para Android. Menos anuncios, carga rápida y acceso directo a tus partidos favoritos en vivo. ¡Experimenta el mejor fútbol desde tu móvil!">
     <meta name="keywords"
         content="fútbol en vivo, deportes gratis, transmisiones deportivas, partidos hoy, DeVoleaTV, roja directa, tarjeta roja, futbol libre">
     <meta name="author" content="DeVoleaTV">
@@ -38,14 +38,29 @@
 
     <!-- Structured Data -->
     <script type="application/ld+json">
-    {
+        {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "DeVoleaTV",
-        "description": "Transmisiones deportivas en vivo gratuitas",
-        "url": "https://www.devoleatv.xyz"
-    }
+        "url": "https://devoleatv.xyz",
+        "description": "Plataforma gratuita para ver fútbol y deportes en vivo online.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "DeVoleaTV",
+            "url": "https://devoleatv.xyz",
+            "logo": {
+            "@type": "ImageObject",
+            "url": "https://devoleatv.xyz/assets/images/devolealogoPNG.png"
+            }
+        },
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://devoleatv.xyz/?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+        }
+        }
     </script>
+
 
     <link rel="canonical" href="https://devoleatv.xyz/">
 
@@ -64,50 +79,53 @@
 
 <body>
     <div id="notice">
-    <div class="content">
-      <button id="close-btn">✖</button>
-      <div class="notice-body">
-        <div class="notice-icon"><img src="assets/images/app-android.png" alt="Icono de Aplicacion Android"></div>
-        <h2>¡Descarga nuestra App!</h2>
-        <p>Disfruta DeVoleaTV desde tu dispositivo Android</p>
-        <a href="download.html" id="download-btn" class="download-button">
-          Descargar
-        </a>
-      </div>
+        <div class="content">
+            <button id="close-btn">✖</button>
+            <div class="notice-body">
+                <div class="notice-icon"><img src="assets/images/app-android.png" alt="Icono de Aplicacion Android">
+                </div>
+                <h2>¡Descarga nuestra App!</h2>
+                <p>Disfruta DeVoleaTV desde tu dispositivo Android</p>
+                <a href="download.html" id="download-btn" class="download-button">
+                    Descargar
+                </a>
+            </div>
+        </div>
     </div>
-</div>
     <header>
         <a href="#" class="header-logo">
             <img class="logo-img" src="assets/images/devolealogoPNG.png" alt="Logo DeVoleaTV">
         </a>
     </header>
     <main>
-   <div class="player-box">
-    <!-- NUEVO contenedor para el iframe -->
-    <div class="iframe-container">
-        <iframe id="main-frame" src="" allowfullscreen loading="lazy" title="Reproductor en vivo"></iframe>
-    </div>
-        <div class="player-info">
-            <div class="match-a">
-                <div class="match-info">
-                    <div id="match-info-tournament-hour">
-                        <p class="tournament">Sin datos</p>
-                        <p class="tournament">|</p>
-                        <p class="hour">00:00</p>
+        <div class="player-box">
+            <!-- NUEVO contenedor para el iframe -->
+            <div class="iframe-container">
+                <iframe id="main-frame" src="" allowfullscreen loading="lazy" title="Reproductor en vivo"></iframe>
+            </div>
+            <div class="player-info">
+                <div class="match-a">
+                    <div class="match-info">
+                        <div id="match-info-tournament-hour">
+                            <p class="tournament">Sin datos</p>
+                            <p class="tournament">|</p>
+                            <p class="hour">00:00</p>
+                        </div>
+                        <div id="match-info-teams">
+                            <p class="teams" id="teams-player"></p>
+                        </div>
                     </div>
-                    <div id="match-info-teams">
-                        <p class="teams" id="teams-player"></p>
+                    <div id="match-info-img">
+                        <button type="submit" id="match-info-img-button" onclick="reloadFrame()">
+                            <img src="assets/images/update.svg" alt="Recargar Reproductor" />
+                        </button>
                     </div>
-                </div>
-                <div id="match-info-img">
-                    <button type="submit" id="match-info-img-button" onclick="reloadFrame()">
-                        <img src="assets/images/update.svg" alt="Recargar Reproductor" />
-                    </button>
                 </div>
             </div>
-        </div>
-        <p class="player-box-notice">Los anuncios nos ayudan a mantener el sitio. Ciérrelos para continuar. El reproductor tambien puede incluir anuncios externos. <a href="download.html">DESCARGA LA APLICACIÓN PARA UNA EXPERIENCIA ¡SIN INTERRUMPCIONES!</a>
-        </p>
+            <p class="player-box-notice" data-nosnippet>Los anuncios nos ayudan a mantener el sitio. Ciérrelos para
+                continuar. El reproductor tambien puede incluir anuncios externos. <a href="download.html">DESCARGA LA
+                    APLICACIÓN PARA UNA EXPERIENCIA ¡SIN INTERRUMPCIONES!</a>
+            </p>
         </div>
         <div class="gamelist">
             <div class="gamelist-search">

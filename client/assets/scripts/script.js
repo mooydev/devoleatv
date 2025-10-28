@@ -255,42 +255,32 @@ const Utils = {
 };
 
 const DateUtils = {
-  parseMatchTime(horaUTCminus5, fecha = null) {
-    const { DateTime } = luxon;
-    const [h, m] = horaUTCminus5.split(':').map(Number);
-    
-    let year, month, day;
-    
-    if (fecha) {
-      const dateObj = new Date(fecha);
-      year = dateObj.getUTCFullYear();
-      month = dateObj.getUTCMonth() + 1; // getUTCMonth() devuelve 0-11
-      day = dateObj.getUTCDate();
-    } else {
-      const now = DateTime.now();
-      year = now.year;
-      month = now.month;
-      day = now.day;
-    }
-    
-    // Crear fecha/hora en UTC-5
-    const matchTimeUTC5 = DateTime.fromObject(
-      { 
-        year: year,
-        month: month,
-        day: day,
-        hour: h, 
-        minute: m,
-        second: 0,
-        millisecond: 0
-      },
-      { zone: 'UTC-5' }
-    );
-    
-    const localTime = matchTimeUTC5.setZone('local');
-    
-    return localTime;
-  },
+ parseMatchTime(horaUTCminus5, fecha = null) {
+  const { DateTime } = luxon;
+  const [h, m] = horaUTCminus5.split(':').map(Number);
+  
+  let year, month, day;
+  
+  if (fecha) {
+    // Formato nuevo: "2025-10-28"
+    const [y, m, d] = fecha.split('-').map(Number);
+    year = y;
+    month = m;
+    day = d;
+  } else {
+    const now = DateTime.now();
+    year = now.year;
+    month = now.month;
+    day = now.day;
+  }
+  
+  const matchTimeUTC5 = DateTime.fromObject(
+    { year, month, day, hour: h, minute: m, second: 0, millisecond: 0 },
+    { zone: 'UTC-5' }
+  );
+  
+  return matchTimeUTC5.setZone('local');
+},
 
   isMatchExpired(horaUTCminus5, fecha = null) {
     const matchTime = this.parseMatchTime(horaUTCminus5, fecha);
@@ -387,12 +377,10 @@ const NoticeManager = {
 
   shouldShowNotice() {
     if (this.isAndroidApp()) {
-      console.log('Usuario en app Android - Notice oculto');
       return false;
     }
 
     if (this.hasClosedNotice()) {
-      console.log('Usuario ya cerró el notice - Notice oculto');
       return false;
     }
 
@@ -806,25 +794,32 @@ groupMatches(partidos) {
 
     return this.filterAndSortMatches(grouped);
   },
-
-filterAndSortMatches(partidos) {
-  console.log('=== DEBUG filterAndSortMatches ===');
-  console.log('Partidos recibidos:', partidos.length);
-  console.log('Datos de partidos:', partidos);
   
-  // Verificar cada partido
+filterAndSortMatches(partidos) {
+  const { DateTime } = luxon;
+  const today = DateTime.now();
+  
+  // Filtrar solo partidos de hoy que no hayan expirado
   const active = partidos.filter(p => {
-    const isExpired = DateUtils.isMatchExpired(p.hora, p.fecha);
-    console.log(`Partido: ${p.equipos}`);
-    console.log(`  Hora API: ${p.hora}`);
-    console.log(`  Fecha API: ${p.fecha}`);
-    console.log(`  ¿Expirado?: ${isExpired}`);
-    return !isExpired;
+    if (!p.fecha) return false;
+    
+    // Parsear fecha formato "YYYY-MM-DD"
+    const [year, month, day] = p.fecha.split('-').map(Number);
+    
+    // Verificar que sea de hoy
+    const isToday = (
+      year === today.year &&
+      month === today.month &&
+      day === today.day
+    );
+    
+    if (!isToday) return false;
+    
+    // Verificar que no haya expirado
+    return !DateUtils.isMatchExpired(p.hora, p.fecha);
   });
 
-  console.log('Partidos activos después de filtrar:', active.length);
-  console.log('=== FIN DEBUG ===');
-
+  // Ordenar por hora
   active.sort((a, b) => 
     DateUtils.compareMatchTimes(a.hora, a.fecha, b.hora, b.fecha)
   );
