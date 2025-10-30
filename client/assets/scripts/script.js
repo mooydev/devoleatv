@@ -47,30 +47,30 @@ const DOMElements = {
     this.validateElements();
   },
 
- createIframeOverlays() {
-  // Buscar el contenedor del iframe
-  const iframeContainer = document.querySelector('.iframe-container');
-  
-  if (!iframeContainer) {
-    console.error('No se encontró .iframe-container');
-    return;
-  }
+  createIframeOverlays() {
+    // Buscar el contenedor del iframe
+    const iframeContainer = document.querySelector('.iframe-container');
 
-  // Contenedor para loading del iframe
-  this.iframeLoading = document.createElement('div');
-  this.iframeLoading.id = 'iframe-loading';
-  this.iframeLoading.className = 'iframe-overlay iframe-loading-overlay';
-  this.iframeLoading.innerHTML = `
+    if (!iframeContainer) {
+      console.error('No se encontró .iframe-container');
+      return;
+    }
+
+    // Contenedor para loading del iframe
+    this.iframeLoading = document.createElement('div');
+    this.iframeLoading.id = 'iframe-loading';
+    this.iframeLoading.className = 'iframe-overlay iframe-loading-overlay';
+    this.iframeLoading.innerHTML = `
     <div class="iframe-loading-content">
       <div class="iframe-spinner"></div>
     </div>
   `;
 
-  // Contenedor para error del iframe
-  this.iframeError = document.createElement('div');
-  this.iframeError.id = 'iframe-error';
-  this.iframeError.className = 'iframe-overlay iframe-error-overlay';
-  this.iframeError.innerHTML = `
+    // Contenedor para error del iframe
+    this.iframeError = document.createElement('div');
+    this.iframeError.id = 'iframe-error';
+    this.iframeError.className = 'iframe-overlay iframe-error-overlay';
+    this.iframeError.innerHTML = `
     <div class="iframe-error-content">
       <h3 class="iframe-error-title">ALGO SALIÓ MAL</h3>
       <p class="iframe-error-description">No se pudo cargar el recurso. Esto puede suceder por:</p>
@@ -83,10 +83,10 @@ const DOMElements = {
     </div>
   `;
 
-  // CAMBIO IMPORTANTE: Agregar al iframe-container, NO al player-box
-  iframeContainer.appendChild(this.iframeLoading);
-  iframeContainer.appendChild(this.iframeError);
-},
+    // CAMBIO IMPORTANTE: Agregar al iframe-container, NO al player-box
+    iframeContainer.appendChild(this.iframeLoading);
+    iframeContainer.appendChild(this.iframeError);
+  },
 
   validateElements() {
     const requiredElements = ['iframe', 'gamelist', 'loader'];
@@ -255,32 +255,32 @@ const Utils = {
 };
 
 const DateUtils = {
- parseMatchTime(horaUTCminus5, fecha = null) {
-  const { DateTime } = luxon;
-  const [h, m] = horaUTCminus5.split(':').map(Number);
-  
-  let year, month, day;
-  
-  if (fecha) {
-    // Formato nuevo: "2025-10-28"
-    const [y, m, d] = fecha.split('-').map(Number);
-    year = y;
-    month = m;
-    day = d;
-  } else {
-    const now = DateTime.now();
-    year = now.year;
-    month = now.month;
-    day = now.day;
-  }
-  
-  const matchTimeUTC5 = DateTime.fromObject(
-    { year, month, day, hour: h, minute: m, second: 0, millisecond: 0 },
-    { zone: 'UTC-5' }
-  );
-  
-  return matchTimeUTC5.setZone('local');
-},
+  parseMatchTime(horaUTCminus5, fecha = null) {
+    const { DateTime } = luxon;
+    const [h, m] = horaUTCminus5.split(':').map(Number);
+
+    let year, month, day;
+
+    if (fecha) {
+      // Formato nuevo: "2025-10-28"
+      const [y, m, d] = fecha.split('-').map(Number);
+      year = y;
+      month = m;
+      day = d;
+    } else {
+      const now = DateTime.now();
+      year = now.year;
+      month = now.month;
+      day = now.day;
+    }
+
+    const matchTimeUTC5 = DateTime.fromObject(
+      { year, month, day, hour: h, minute: m, second: 0, millisecond: 0 },
+      { zone: 'UTC-5' }
+    );
+
+    return matchTimeUTC5.setZone('local');
+  },
 
   isMatchExpired(horaUTCminus5, fecha = null) {
     const matchTime = this.parseMatchTime(horaUTCminus5, fecha);
@@ -347,13 +347,10 @@ const NoticeManager = {
 
   isAndroidApp() {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    
     const isAndroid = /android/i.test(userAgent);
     const isWebView = /wv|webview/i.test(userAgent);
-    
-    
-    const isDeVoleaApp = window.DeVoleaApp !== undefined; // por ver en app
-    
+    const isDeVoleaApp = /DeVoleaApp/i.test(userAgent); // ✅ Esto detectará tu app
+
     return (isAndroid && isWebView) || isDeVoleaApp;
   },
 
@@ -455,49 +452,49 @@ const NoticeManager = {
 // ================================
 const MatchManager = {
   actualizarPlayer(partido, linkIndex = 0) {
-  if (!partido || !DOMElements.iframe) {
-    console.error('Partido o iframe no válido');
-    return;
-  }
-
-  const link = partido.link || (partido.links && partido.links[linkIndex]);
-  
-  if (!link) {
-    console.error('Link no disponible');
-    return;
-  }
-
-  // CAMBIO CLAVE: Separar la actualización de info vs iframe
-  const isSameStream = link === AppState.getCurrentStream();
-
-  try {
-    // SIEMPRE actualizar la información del partido
-    this.updateMatchInfo(partido);
-    this.setActiveMatch(partido.id_partido);
-    this.setActiveLink(linkIndex, partido.id_partido);
-
-    // Solo recargar el iframe si el link es diferente
-    if (!isSameStream) {
-      IframeManager.showLoading();
-      IframeManager.hideError();
-      IframeManager.setLoadTimeout();
-
-      DOMElements.iframe.src = link;
-      AppState.setCurrentStream(link);
-      AppState.setActiveLink(linkIndex, partido.id_partido);
+    if (!partido || !DOMElements.iframe) {
+      console.error('Partido o iframe no válido');
+      return;
     }
 
-    this.scrollToPlayerOnMobile();
-  } catch (error) {
-    console.error('Error al actualizar reproductor:', error);
-    IframeManager.hideLoading();
-    IframeManager.showError();
-  }
-},
+    const link = partido.link || (partido.links && partido.links[linkIndex]);
 
-   setActiveLink(linkIndex, partidoId) {
+    if (!link) {
+      console.error('Link no disponible');
+      return;
+    }
+
+    // CAMBIO CLAVE: Separar la actualización de info vs iframe
+    const isSameStream = link === AppState.getCurrentStream();
+
+    try {
+      // SIEMPRE actualizar la información del partido
+      this.updateMatchInfo(partido);
+      this.setActiveMatch(partido.id_partido);
+      this.setActiveLink(linkIndex, partido.id_partido);
+
+      // Solo recargar el iframe si el link es diferente
+      if (!isSameStream) {
+        IframeManager.showLoading();
+        IframeManager.hideError();
+        IframeManager.setLoadTimeout();
+
+        DOMElements.iframe.src = link;
+        AppState.setCurrentStream(link);
+        AppState.setActiveLink(linkIndex, partido.id_partido);
+      }
+
+      this.scrollToPlayerOnMobile();
+    } catch (error) {
+      console.error('Error al actualizar reproductor:', error);
+      IframeManager.hideLoading();
+      IframeManager.showError();
+    }
+  },
+
+  setActiveLink(linkIndex, partidoId) {
     // Remover clase active de todos los links
-    document.querySelectorAll('.links-list a.active').forEach(el => 
+    document.querySelectorAll('.links-list a.active').forEach(el =>
       el.classList.remove('active')
     );
 
@@ -621,18 +618,18 @@ const ListRenderer = {
     DOMElements.gamelist.appendChild(li);
   },
 
-    createLinksSublist(li, partido) {
+  createLinksSublist(li, partido) {
     const linksList = li.querySelector('.links-list');
-    
+
     partido.links.forEach((link, i) => {
       const option = document.createElement('li');
       option.innerHTML = `<a href="#" data-link-index="${i}">Opción ${i + 1}</a>`;
-      
+
       option.addEventListener('click', (e) => {
         e.preventDefault();
         MatchManager.actualizarPlayer({ ...partido, link }, i);
       });
-      
+
       linksList.appendChild(option);
     });
   },
@@ -643,7 +640,7 @@ const ListRenderer = {
 
     header.addEventListener('click', () => {
       const isActive = linksList.classList.contains('open');
-      
+
       // Cerrar todas las listas abiertas
       document.querySelectorAll('.links-list').forEach(list => {
         list.classList.remove('open');
@@ -773,7 +770,7 @@ const APIManager = {
     }
   },
 
-groupMatches(partidos) {
+  groupMatches(partidos) {
     const grouped = Object.values(
       partidos.reduce((acc, item) => {
         const key = `${item.equipos}`;
@@ -794,38 +791,38 @@ groupMatches(partidos) {
 
     return this.filterAndSortMatches(grouped);
   },
-  
-filterAndSortMatches(partidos) {
-  const { DateTime } = luxon;
-  const today = DateTime.now();
-  
-  // Filtrar solo partidos de hoy que no hayan expirado
-  const active = partidos.filter(p => {
-    if (!p.fecha) return false;
-    
-    // Parsear fecha formato "YYYY-MM-DD"
-    const [year, month, day] = p.fecha.split('-').map(Number);
-    
-    // Verificar que sea de hoy
-    const isToday = (
-      year === today.year &&
-      month === today.month &&
-      day === today.day
+
+  filterAndSortMatches(partidos) {
+    const { DateTime } = luxon;
+    const today = DateTime.now();
+
+    // Filtrar solo partidos de hoy que no hayan expirado
+    const active = partidos.filter(p => {
+      if (!p.fecha) return false;
+
+      // Parsear fecha formato "YYYY-MM-DD"
+      const [year, month, day] = p.fecha.split('-').map(Number);
+
+      // Verificar que sea de hoy
+      const isToday = (
+        year === today.year &&
+        month === today.month &&
+        day === today.day
+      );
+
+      if (!isToday) return false;
+
+      // Verificar que no haya expirado
+      return !DateUtils.isMatchExpired(p.hora, p.fecha);
+    });
+
+    // Ordenar por hora
+    active.sort((a, b) =>
+      DateUtils.compareMatchTimes(a.hora, a.fecha, b.hora, b.fecha)
     );
-    
-    if (!isToday) return false;
-    
-    // Verificar que no haya expirado
-    return !DateUtils.isMatchExpired(p.hora, p.fecha);
-  });
 
-  // Ordenar por hora
-  active.sort((a, b) => 
-    DateUtils.compareMatchTimes(a.hora, a.fecha, b.hora, b.fecha)
-  );
-
-  return active;
-}
+    return active;
+  }
 };
 
 // ================================
@@ -873,7 +870,7 @@ const App = {
 
       if (grouped.length > 0) {
         ListRenderer.renderizarLista(grouped);
-        MatchManager.actualizarPlayer(grouped[0], 0); 
+        MatchManager.actualizarPlayer(grouped[0], 0);
         MatchManager.setActiveMatch(grouped[0].id_partido);
         MatchManager.setActiveLink(0, grouped[0].id_partido);
       } else {
@@ -910,12 +907,12 @@ const App = {
     this.refreshInterval = setInterval(() => {
       const current = AppState.getPartidos();
       const filtered = APIManager.filterAndSortMatches(current);
-      
+
       if (filtered.length !== current.length) {
         console.log('Actualizando lista: partidos vencidos removidos');
         AppState.setPartidos(filtered);
         ListRenderer.renderizarLista(filtered);
-        
+
         // Si el partido actual venció, cargar el siguiente
         if (filtered.length > 0) {
           MatchManager.actualizarPlayer(filtered[0], 0);
