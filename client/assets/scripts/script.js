@@ -12,7 +12,7 @@ const CONFIG = {
   RESPONSIVE_CHECK_INTERVAL: 1000,
   POPUNDER_OPEN_INTERVAL: 7000,
   POPUNDER_LIMIT: 3,
-  IFRAME_LOAD_TIMEOUT: 15000 // Timeout de 15 segundos
+  IFRAME_LOAD_TIMEOUT: 15000
 };
 
 // ================================
@@ -41,14 +41,11 @@ const DOMElements = {
     this.reloadButton = document.getElementById("match-info-img-button");
     this.loader = document.getElementById("loader");
     this.inputSearch = document.getElementById("search");
-
-    // Crear elementos para loading y error del iframe
     this.createIframeOverlays();
     this.validateElements();
   },
 
   createIframeOverlays() {
-    // Buscar el contenedor del iframe
     const iframeContainer = document.querySelector('.iframe-container');
 
     if (!iframeContainer) {
@@ -56,7 +53,6 @@ const DOMElements = {
       return;
     }
 
-    // Contenedor para loading del iframe
     this.iframeLoading = document.createElement('div');
     this.iframeLoading.id = 'iframe-loading';
     this.iframeLoading.className = 'iframe-overlay iframe-loading-overlay';
@@ -66,7 +62,6 @@ const DOMElements = {
     </div>
   `;
 
-    // Contenedor para error del iframe
     this.iframeError = document.createElement('div');
     this.iframeError.id = 'iframe-error';
     this.iframeError.className = 'iframe-overlay iframe-error-overlay';
@@ -82,8 +77,6 @@ const DOMElements = {
       <p class="iframe-error-description">Prueba recargar el reproductor con el boton inferior derecho</p>
     </div>
   `;
-
-    // CAMBIO IMPORTANTE: Agregar al iframe-container, NO al player-box
     iframeContainer.appendChild(this.iframeLoading);
     iframeContainer.appendChild(this.iframeError);
   },
@@ -343,13 +336,13 @@ const PopunderManager = {
 // ================================
 const NoticeManager = {
   STORAGE_KEY: 'devoleatv_notice_closed',
-  NOTICE_VERSION: 'android_app_v1', // Cambia esto cuando quieras mostrar un nuevo aviso
+  NOTICE_VERSION: 'android_app_v1', // cambiar para mostrar nuevo aviso
 
   isAndroidApp() {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isAndroid = /android/i.test(userAgent);
     const isWebView = /wv|webview/i.test(userAgent);
-    const isDeVoleaApp = /DeVoleaApp/i.test(userAgent); // ✅ Esto detectará tu app
+    const isDeVoleaApp = /DeVoleaApp/i.test(userAgent);
 
     return (isAndroid && isWebView) || isDeVoleaApp;
   },
@@ -464,16 +457,13 @@ const MatchManager = {
       return;
     }
 
-    // CAMBIO CLAVE: Separar la actualización de info vs iframe
     const isSameStream = link === AppState.getCurrentStream();
 
     try {
-      // SIEMPRE actualizar la información del partido
       this.updateMatchInfo(partido);
       this.setActiveMatch(partido.id_partido);
       this.setActiveLink(linkIndex, partido.id_partido);
 
-      // Solo recargar el iframe si el link es diferente
       if (!isSameStream) {
         IframeManager.showLoading();
         IframeManager.hideError();
@@ -482,8 +472,11 @@ const MatchManager = {
         DOMElements.iframe.src = link;
         AppState.setCurrentStream(link);
         AppState.setActiveLink(linkIndex, partido.id_partido);
-      }
 
+        if (DOMElements.reloadButton) {
+         this.enableReloadButton();
+        }
+      }
       this.scrollToPlayerOnMobile();
     } catch (error) {
       console.error('Error al actualizar reproductor:', error);
@@ -493,12 +486,10 @@ const MatchManager = {
   },
 
   setActiveLink(linkIndex, partidoId) {
-    // Remover clase active de todos los links
     document.querySelectorAll('.links-list a.active').forEach(el =>
       el.classList.remove('active')
     );
 
-    // Activar el link específico del partido actual
     const matchElement = DOMElements.gamelist.querySelector(`[data-id="${partidoId}"]`);
     if (matchElement) {
       const linkElement = matchElement.querySelector(`.links-list li:nth-child(${linkIndex + 1}) a`);
@@ -524,12 +515,10 @@ const MatchManager = {
   },
 
   setActiveMatch(partidoId) {
-    // Remover clases activas
     document.querySelectorAll('.match.active, .links-list.active').forEach(el =>
       el.classList.remove('active')
     );
 
-    // Activar el partido actual
     if (DOMElements.gamelist) {
       const matchElement = DOMElements.gamelist.querySelector(`[data-id="${partidoId}"]`);
       if (matchElement) {
@@ -545,11 +534,29 @@ const MatchManager = {
   },
 
   reloadFrame() {
-    if (DOMElements.iframe && DOMElements.iframe.src) {
+    if (DOMElements.iframe && DOMElements.iframe.src && DOMElements.iframe.src !== window.location.href) {
       IframeManager.showLoading();
       IframeManager.hideError();
       IframeManager.setLoadTimeout();
       DOMElements.iframe.src = DOMElements.iframe.src;
+    } else {
+      console.log('No hay stream para recargar');
+    }
+  },
+
+  disableReloadButton() {
+    if (DOMElements.reloadButton) {
+      DOMElements.reloadButton.disabled = true;
+      DOMElements.reloadButton.style.opacity = '0.5';
+      DOMElements.reloadButton.style.cursor = 'not-allowed';
+    }
+  },
+
+  enableReloadButton() {
+    if (DOMElements.reloadButton) {
+      DOMElements.reloadButton.disabled = false;
+      DOMElements.reloadButton.style.opacity = '1';
+      DOMElements.reloadButton.style.cursor = 'pointer';
     }
   }
 };
@@ -658,10 +665,12 @@ const ListRenderer = {
 
   renderEmptyState() {
     DOMElements.gamelist.innerHTML = '<li class="empty-state">Parece que no hay eventos en este momento.</li>';
+    MatchManager.disableReloadButton();
   },
 
   renderErrorState() {
     DOMElements.gamelist.innerHTML = '<li class="error-state">Algo salió mal al intentar obtener los eventos.<button class="button-normal" onclick="location.reload()">Reintentar</button></li>';
+    MatchManager.disableReloadButton();
   }
 };
 
@@ -677,6 +686,8 @@ const SearchManager = {
       ListRenderer.renderizarLista(partidos);
       if (partidos.length > 0) {
         MatchManager.setActiveMatch(partidos[0].id_partido);
+      }else{
+        MatchManager.disableReloadButton();
       }
       return;
     }
@@ -685,6 +696,8 @@ const SearchManager = {
     ListRenderer.renderizarLista(results);
     if (results.length > 0) {
       MatchManager.setActiveMatch(results[0].id_partido);
+    }else{
+      MatchManager.disableReloadButton();
     }
   },
 
@@ -821,6 +834,7 @@ const APIManager = {
       DateUtils.compareMatchTimes(a.hora, a.fecha, b.hora, b.fecha)
     );
 
+
     return active;
   }
 };
@@ -862,7 +876,7 @@ const App = {
 
       const partidosRaw = await APIManager.fetchPartidos();
       const grouped = APIManager.groupMatches(partidosRaw);
-
+      
 
       this.hideLoader();
 
@@ -916,6 +930,8 @@ const App = {
         // Si el partido actual venció, cargar el siguiente
         if (filtered.length > 0) {
           MatchManager.actualizarPlayer(filtered[0], 0);
+        }else{
+          MatchManager.disableReloadButton();
         }
       }
     }, 5 * 60 * 1000); // 5 minutos
