@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // ===================================================
         // URL directa desde GitHub Releases
         
-        const apkUrl = 'https://github.com/mooydev/devoleatv-releases/releases/latest/download/devoleatv-app-release_v_1_0_0.apk';
+        const apkUrl = 'https://github.com/mooydev/devoleatv-releases/releases/latest/download/devoleatv-app-release_v_1_0_1.apk';
 
         // ===================================================
         // EFECTO DE DESCARGA (UX)
