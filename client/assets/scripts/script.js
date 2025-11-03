@@ -852,7 +852,6 @@ const App = {
       this.setupEventListeners();
       ResponsiveManager.init();
       PopunderManager.init();
-      this.startAutoRefresh();
       await this.loadMatches();
     } catch (error) {
       console.error('Error al inicializar la aplicación:', error);

@@ -94,6 +94,15 @@ header img {
   color: var(--color-text);
 }
 
+.player-box a{
+  -webkit-animation: blink 2s linear infinite;
+  animation: blink 2s linear infinite;;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; } /* Completamente visible */
+  50% { opacity: 0; }    /* Invisible en la mitad de la animación */
+}
 
 .player-info {
   display: flex;
