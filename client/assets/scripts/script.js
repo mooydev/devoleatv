@@ -3,7 +3,7 @@
 // ================================
 const CONFIG = {
   POPUNDER_URL: "https://www.revenuecpmgate.com/vvpynx41d?key=afac2ed93a1337c32c53ae6ac0eaf064",
-  API_URL: "https://devoleatv-api.onrender.com/api/partidos",
+  API_URL: "https://api.devoleatv.xyz/api/partidos",
   TIMEZONE: 'UTC-5',
   BREAKPOINTS: {
     MOBILE: 768,
