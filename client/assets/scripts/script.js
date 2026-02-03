@@ -4,7 +4,7 @@
 const CONFIG = {
   POPUNDER_URL: "https://www.revenuecpmgate.com/vvpynx41d?key=afac2ed93a1337c32c53ae6ac0eaf064",
   API_URL: "https://api.devoleatv.xyz/api/partidos",
-  TIMEZONE: 'UTC-5',
+  TIMEZONE: 'UTC-6',
   BREAKPOINTS: {
     MOBILE: 768,
     TABLET_ASPECT_RATIO: 1.5
