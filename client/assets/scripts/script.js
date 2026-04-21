@@ -269,7 +269,7 @@ const DateUtils = {
 
     const matchTimeUTC5 = DateTime.fromObject(
       { year, month, day, hour: h, minute: m, second: 0, millisecond: 0 },
-      { zone: 'UTC-5' }
+      { zone: CONFIG.TIMEZONE }
     );
 
     return matchTimeUTC5.setZone('local');
